@@ -449,7 +449,7 @@ repo的勾打上即可。然后翻到页面最底部，点击`Generate token`的
 
 **注意：**这个token生成后只会显示一次！你要把这个token复制一下存到其他地方以备以后要用。
 
-​     token: 1fb47e7fd291e89f0ebb192aa49a87938f4bee74 
+​     
 
 
 

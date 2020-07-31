@@ -8,5 +8,8 @@
 *.jpg
 
 # 取反 
-!*account*
+# !*account*
 
+.DS_Store
+
+account.md
