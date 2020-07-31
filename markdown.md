@@ -510,15 +510,33 @@ Multiple themes
 
 ```bash
 npm i docsify-cli -g
-docsify init ./docs
-
-index.html as the entry file
-README.md as the home page
-
-docsify serve docs // Preview your site
+cd blog
+docsify init ./ 
 ```
 
- 
+ After the init is complete, you can see the file list in direction
+
+- `index.html` as the entry file
+- `README.md` as the home page
+- `.nojekyll` prevents GitHub Pages from ignoring files that begin with an underscore
+
+Preview your site
+
+```
+$ docsify serve ./ 
+```
+
+
+
+编辑index.html
+
+```
+<div id="app">Please wait...</div>
+```
+
+
+
+## [More pages](https://docsify.js.org/#/more-pages?id=more-pages)
 
 ```text
 .
@@ -538,6 +556,39 @@ docs/guide.md         => http://domain.com/#/guide
 docs/zh-cn/README.md  => http://domain.com/#/zh-cn/
 docs/zh-cn/guide.md   => http://domain.com/#/zh-cn/guide
 ```
+
+## [Sidebar](https://docsify.js.org/#/more-pages?id=sidebar)
+
+you can create your own `_sidebar.md` (see [this documentation's sidebar](https://github.com/docsifyjs/docsify/blob/master/docs/_sidebar.md) for an example):
+
+First, you need to set `loadSidebar` to **true**. 
+
+```markdown
+<!-- docs/_sidebar.md -->
+
+* [Home](/)
+* [Guide](guide.md)
+```
+
+Docsify only looks for `_sidebar.md` in the current folder, 
+
+## [Nested Sidebars](https://docsify.js.org/#/more-pages?id=nested-sidebars)
+
+## [Set Page Titles from Sidebar Selection](https://docsify.js.org/#/more-pages?id=set-page-titles-from-sidebar-selection)
+
+```markdown
+<!-- docs/_sidebar.md -->
+* [Home](/)
+* [Guide](guide.md "The greatest guide in the world")
+```
+
+设置每页的 title属性
+
+
+
+
+
+
 
 
 

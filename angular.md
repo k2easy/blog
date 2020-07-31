@@ -38,8 +38,8 @@ let user = new Student("Jane", "M.", "User");
 document.body.textContent = greeter(user); 
 
 ```
-
-# 快速上手
+# go101
+##  快速上手
 
 ```sh
 npm install -g @angular/cli
