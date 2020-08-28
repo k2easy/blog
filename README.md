@@ -23,7 +23,7 @@ https://cdn.jsdelivr.net/npm/prismjs@1/components/
 echo "hello"
 ```
 
-发布
+![logo](https://docsify.js.org/_media/icon.svg ':size=50x100')
 
 
 ```

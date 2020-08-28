@@ -461,7 +461,7 @@ repo的勾打上即可。然后翻到页面最底部，点击`Generate token`的
 
 ## 修改配置参数后生效
 
- ![image-20200721181118289](/Users/demo/Library/Application Support/typora-user-images/image-20200721181118289.png)
+注意：仓库名不能有空格 ![image-20200721181118289](/Users/demo/Library/Application Support/typora-user-images/image-20200721181118289.png)
 
 ------
 
@@ -495,6 +495,10 @@ https://cdn.jsdelivr.net/gh/k2easy/picgo/2020/07/21180729.gif
 ## [Typora 支持 PicGo 来上传图片了](https://molunerfinn.com/typora-supports-picgo/#%E8%87%AA%E5%AE%9A%E4%B9%89%E5%9B%BE%E7%89%87%E4%B8%8A%E4%BC%A0%E6%9C%8D%E5%8A%A1%E7%9A%84%E8%AE%BE%E7%BD%AE)
 
 https://support.typora.io/Upload-Image/#config-picgo-core
+
+
+
+
 
 
 
