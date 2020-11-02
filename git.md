@@ -108,7 +108,7 @@ $ git clone https://github.com/libgit2/libgit2 mylibgit
 
 工作目录下的文件状态：未跟踪、已跟踪（未修改、已修改、已放入暂存区）
 
- <img src="/Users/demo/Library/Application Support/typora-user-images/image-20200709071544624.png" alt="image-20200709071544624" style="zoom:50%;" />
+ <img src="https://cdn.jsdelivr.net/gh/k2easy/picgo/2020/11/0220201102172255.png" alt="image-20200709071544624" style="zoom:50%;" />
 
 ```
 git status 检查当前文件状态
