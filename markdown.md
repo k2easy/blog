@@ -54,6 +54,7 @@ F11进入全屏状态
 
 高效的Typora让你双手不用离开键盘
 ## 快捷键
+
 ```
 任务列表 -[空格]空格文字
 设为标题 ctrl+数字
@@ -85,9 +86,8 @@ F11进入全屏状态
 >
 >  
 
- 
-
-
+ 在新标签页中打开文件
+![screen shot 2017-10-18 at 9 57 09 am](https://cdn.jsdelivr.net/gh/k2easy/picgo/2020/11/0120201101184037.png)
 
 
 
@@ -327,6 +327,8 @@ In HTML Block, no empty line is not allowed, or it will be rendered as two HTML 
 
 # 快捷键
 
+outline view,右键 展开全部
+
 选中单词 cmd+D
 删除单词 Shift+cmd+D
 
@@ -528,6 +530,7 @@ Preview your site
 
 ```
 $ docsify serve ./ 
+localhost:3000
 ```
 
 

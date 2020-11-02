@@ -1,3 +1,47 @@
+#  ER图
+
+### **实体****属性****联系****联系本身也可以有属性**
+
+
+
+```
+NUMERIC_SCALE column in INFORMATION_SCHEMA.COLUMNS table for DATA_TYPE='double' NULL?
+```
+
+# INFORMATION_SCHEMA.COLUMNS
+
+> INFORMATION_SCHEMA.COLUMNS
+>
+> NUMERIC_SCALE 除了 DECIMAL(,)  DOUBLE(10, 5) 类型 外都是null
+
+
+
+```
+LOCATE(substr,str), 　　LOCATE(substr,str,pos)
+第一个语法返回字符串str第一次出现的子串substr的位置。
+
+第二个语法返回第一次出现在字符串str的子串substr的位置，从位置pos开始。 substr不在str中，则返回0
+
+
+SELECT SUBSTRING_INDEX("first_middle_last", '_', 1); // first
+SELECT SUBSTRING_INDEX("first_middle_last", '_', -1); // last 
+
+
+```
+
+
+
+# [mysql查询结果输出到文件](https://www.cnblogs.com/emanlee/p/4233602.html)
+
+```
+mysql> select count(1) from table  into outfile '/tmp/test.xls';
+
+# mysql -h 127.0.0.1 -u root -p XXXX -P 3306 -e "select * from table"  > /tmp/test/txt
+  
+```
+
+
+
 UNION用的比较多union all是直接连接，取到得是所有值，记录可能有重复   union 是取唯一值，记录没有重复  
 
 
@@ -31,12 +75,12 @@ Select * into new_table  from  old_table
 
 
 INSERT INTO tbl2 SELECT * from tbl1;
- 
+
 SELECT * FROM tbl1 INTO OUTFILE '/tmp/tbl1.txt';
 LOAD DATA INFILE '/tmp/tbl1.txt' INTO TABLE tbl2;
 instead of:
 
-         
+
 create table index_all
     select  i.id,i.name as valName,i.alias,i.unit,i.desc,i.frequency,g.name as group_name,s.name as subject_name, 
                   report.quantity as val,report.update_date 
@@ -367,7 +411,7 @@ hash 索引结构的特殊性，其检索效率非常高，索引的检索可以
 7．删除不再使用或者很少使用的索引
 8. 经常更新修改的字段不要建立索引（针对mysql说，因为字段更改同时索引就要重新建立，排序，而Orcale好像是有这样的机制字段值更改了，它不立刻建立索引，排序索引，而是根据更改个数，时间段去做平衡索引这件事的）
 9、不推荐在同一列建多个索引 
- 
+
 
 
 
@@ -391,7 +435,7 @@ index_id 建立索引，in()执行50s, or执行2s 命中了索引。
 
 ## 设计表时要注意：
 表字段避免null值出现，null值很难查询优化且占用额外的索引空间，推荐默认数字0代替null。 尽量使用INT而非BIGINT，如果非负则加上UNSIGNED（这样数值容量会扩大一倍），当然能使用TINYINT、SMALLINT、MEDIUM_INT更好。 使用枚举或整数代替字符串类型 尽量使用TIMESTAMP而非DATETIME 单表不要有太多字段，建议在20以内 用整型来存IP
- 
+
 ### 整型IP
 MySQL version >= 5.6.3. 支持  IS_IPV6
 ip字段类型设为 VARBINARY(16).
@@ -440,7 +484,7 @@ UDF比存储方法有更高的执行效率，并且支持聚集函数。
 
  大规模的数据输出有两种方式定时任务ETL，写一堆脚本，结合Airflow，DataX，Kettel流处理，即读取binlog然后做后续的处理（比如阿里的canal）定时任务的稍微好维护些，但是延迟比较大（毕竟是每隔几小时，几天跑一次的，数据没有那么及时）而流处理的开发和维护难一些。
  最后的话：如果你的数据量比较大，请只把mysql当作存储用，不要考虑触发器、函数等高级功能。
- 
+
 
  ## binlog
  binlog是Mysql sever层维护的一种二进制日志，与innodb引擎中的redo/undo log是完全不同的日志；其主要是用来记录对mysql数据更新或潜在发生更新的SQL语句，并以"事务"的形式保存在磁盘中；
@@ -476,7 +520,7 @@ TiDB 是 PingCAP 公司设计的开源分布式 HTAP (Hybrid Transactional and A
 
 
 # navicat 
-           
+
 单元格 右键选择set to NULL
 
 
@@ -608,6 +652,27 @@ like “document database,” which means it stores data in chunks
  When a database gets updated, there’s no way for the application to know。
 
 
+
+#  oracle shell
+
+```
+ORACLE_HOME=PATH_TO_ORACLE
+
+export ORACLE_HOME
+
+PATH=$PATH:$ORACLE_HOME/bin
+
+export PATH
+
+sqlplus -s ${DBUSER}/${DBUSERPASSWORD}@//${HOST}:${PORT}/${SERVICE_NAME} <<EOF
+set linesize 32767
+set feedback off
+set heading off
+
+select * FROM dual;
+
+EOF
+```
 
 
 

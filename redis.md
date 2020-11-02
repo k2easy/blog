@@ -30,3 +30,13 @@ https://t.co/kBKoylXGMp?amp=1
 DigitalOcean 发布的免费英文电子书《如何管理 Redis 数据库》，向初学者介绍什么是 Redis 和它的基本用法
 
 IRedis：基于终端的 Redis 客户端，具有代码自动补全、语法高亮、命令验证等不错的功能
+
+
+
+登录后 auth pass
+
+或者 redis-cli -h xxx -p 6379 -a xxx
+
+[DEL key](https://www.runoob.com/redis/keys-del.html)
+该命令用于在 key 存在时删除  key。
+

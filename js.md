@@ -1,11 +1,330 @@
-# SpringBoot问题之org.apache.ibatis.executor.ExecutorException: No constructor found in...的问题
 
-报这个问题是因为在实体类中定义了有参构造函数，但是忽略了无参构造函数的定义，所以在执行查询的时候会报如下错误：比如创造了一个带有参数的构造方法，那么无参的构造方法必须显式的写出来，否则会编译失败"这句话有点不妥，应该这么理解：每个类至少要有一个构造函数，如果你自己构建了一个带有参数的构造函数而没有再显示的写出无参的构造函数也是可以的，不过当你尝试通过一个无参的构造函数来构建（new）时，此时编译器才会报错，因为找不到这个无参的构造函数。也就是说当一个类你没有给他构造函数，则编译器会自动补上一个无参的，若有的话就不会，你需要显示将此无参的构造函数写出来。
-	所以在创建某个实体类的时候，应该养成一个好习惯，显示构造一个无参构造函数，这样就会避免后面遇到的奇葩问题了。 
 
+# npm
 
 
 
+# NPM
+
+```
+默认 npm config set registry https://registry.npmjs.org
+npm config set registry https://registry.npm.taobao.org
+npm config list
+ 
+```
+
+#  [json-server](http://zetcode.com/javascript/jsonserver/)
+
+ json-server is a JavaScript library to create testing REST API.
+
+```
+npm install -g json-server 
+users.json
+{
+  "users": [
+    {
+      "id": 1,
+      "first_name": "Robert",
+      "last_name": "Schwartz",
+      "email": "rob23@gmail.com"
+    },
+    {
+      "id": 2,
+      "first_name": "Lucy",
+      "last_name": "Ballmer",
+      "email": "lucyb56@gmail.com"
+    },
+    {
+      "id": 3,
+      "first_name": "Anna",
+      "last_name": "Smith",
+      "email": "annasmith23@gmail.com"
+    },
+    {
+      "id": 4,
+      "first_name": "Robert",
+      "last_name": "Brown",
+      "email": "bobbrown432@yahoo.com"
+    },
+    {
+      "id": 5,
+      "first_name": "Roger",
+      "last_name": "Bacon",
+      "email": "rogerbacon12@yahoo.com"
+    }
+  ]
+}   
+json-server --watch user.json 
+
+
+axios.get('http://localhost:3000/users?q=yahoo')
+    .then(resp => {
+        console.log(resp.data)
+    }).catch(error => {
+        console.log(error);
+    });
+axios.delete('http://localhost:3000/users/1/')
+
+axios.get('http://localhost:3000/users?_sort=last_name&_order=asc')
+    .then(resp => {
+        data = resp.data;
+        data.forEach(e => {
+            console.log(`${e.first_name}, ${e.last_name}, ${e.email}`)
+        });
+    }).catch(error => {
+        console.log(error);
+    });    
+    
+```
+
+[Can I apply CSS to the elements within an iframe?](https://stackoverflow.com/questions/3286178/can-i-apply-css-to-the-elements-within-an-iframe)
+
+No, not from *outside* the iframe. An `<iframe>` is its own world. If the domains etc. match, then Javascript can  communicate in and out, and could (if it wanted to) inject CSS into a  child frame.
+
+If the `<iframe>` contains content from a different  domain, there's pretty much nothing you can do. The parent page controls the size of the frame and whether it's visible, and can put its own  content *over* the frame by positioning etc, but it can't directly effect the way the actual frame content is rendered. 
+
+# layer
+
+layer.load('数据加载中',{zIndex:layer.zIndex})
+
+# 动态搜索框
+
+```js
+var li = $('li');
+var liSelected;
+$(window).keydown(function(e) {
+    if(e.which === 40) { //arrow down
+        if(liSelected) {
+            liSelected.removeClass('selected');
+            next = liSelected.next();
+            if(next.length > 0) {
+                liSelected = next.addClass('selected');
+            } else {
+                liSelected = li.eq(0).addClass('selected');
+            }
+        } else {
+            liSelected = li.eq(0).addClass('selected');
+        }
+    } else if(e.which === 38) {// arrow up
+        if(liSelected) {
+            liSelected.removeClass('selected');
+            next = liSelected.prev();
+            if(next.length > 0) {
+                liSelected = next.addClass('selected');
+            } else {
+                liSelected = li.last().addClass('selected');
+            }
+        } else {
+            liSelected = li.last().addClass('selected');
+        }
+    }
+});
+
+JSFiddle: http://jsfiddle.net/Vtn5Y/	
+```
+
+keycode  13 = Enter
+
+#常用函数
+
+ `**concat()**` 方法用于合并两个或多个数组。此方法不会更改现有数组，而是返回一个新数组。const array3 = array1.concat(array2);
+
+`**sort()**` 方法用[原地算法](https://en.wikipedia.org/wiki/In-place_algorithm)对数组的元素进行排序，并返回数组。默认排序顺序是在将元素转换为字符串，然后比较它们的UTF-16代码单元值序列时构建的
+
+```
+var arr = [2,3,13,17,4,19,1];
+arr.sort() // 结果：[1, 13, 17, 19, 2, 3, 4]
+var arr = [2,3,13,17,4,19,1];
+arr.sort(function(a,b){ // 这是比较函数
+    return b - a;    // 降序
+})
+console.log(arr) // 结果：[19, 17, 13, 4, 3, 2, 1]
+
+const months = ['March', 'Jan', 'Feb', 'Dec'];
+months.sort();
+console.log(months);
+// expected output: Array ["Dec", "Feb", "Jan", "March"]
+
+
+```
+
+
+
+`**slice()**` 方法返回一个新的数组对象，这一对象是一个由 `begin` 和 `end` 决定的原数组的**浅拷贝**（包括 `begin`，不包括`end`）。原始数组不会被改变。arr.slice([begin[, end]])
+
+const animals = ['ant', 'bison', 'camel', 'duck', 'elephant'];
+
+console.log(animals.slice(2));
+console.log(animals)
+
+> Array ["camel", "duck", "elephant"] > Array ["ant", "bison", "camel", "duck", "elephant"]
+
+`**reverse()**` 方法将数组中元素的位置颠倒，并返回该数组。数组的第一个元素会变成最后一个，数组的最后一个元素变成第一个。该方法会改变原数组。
+
+
+
+`**Math.max()**` 函数返回一组数中的最大值。
+console.log(Math.max(1, 3, 2));// 3
+作用于数组:
+
+```js
+Math.max.apply(null, numArray);//
+
+var arr = [1, 2, 3];
+var max = Math.max(...arr);
+```
+
+
+
+```js
+if ('membername' in object) // With inheritance
+if (object.hasOwnProperty('membername')) // Without inheritance
+```
+
+```js
+if (typeof yourvar !== 'undefined') // Any scope
+```
+
+to check if a variable is declared *and* is not `undefined`:
+
+```js
+if (yourvar !== undefined) // Any scope
+```
+
+ou can now safely use `===` and `!==` to test for `undefined` without using `typeof` as `undefined` has been read-only for some time.
+
+# [ find element by text](https://stackoverflow.com/questions/7321896/jquery-find-element-by-text)
+
+```js
+$('div:contains("test")').css('background-color', 'red');
+<div>This is a test</div>
+<div>Another Div</div>
+```
+
+ 
+
+# apply、call
+
+在 javascript 中，call 和 apply 都是为了改变某个函数运行时的上下文（context）而存在的，换句话说，就是为了改变函数体内部 this 的指向。
+
+```
+function` `fruits() {}
+```
+
+ 
+
+```
+fruits.prototype = {
+  ``color: ``"red"``,
+  ``say: ``function``() {
+    ``console.log(``"My color is "` `+ ``this``.color);
+  ``}
+}
+```
+
+ 
+
+```
+var` `apple = ``new` `fruits;
+apple.say();  ``//My color is red
+
+banana = {
+    color: "yellow"
+}
+apple.say.call(banana);     //My color is yellow
+apple.say.apply(banana);    //My color is yellow
+
+```
+
+apply、call  ，作用完全一样，只是接受参数的方式不太一样。
+
+```
+func.call(``this``, arg1, arg2); 
+func.apply(``this``, [arg1, arg2])
+```
+
+call 需要把参数按顺序传递进去，而 apply 则是把参数放在数组里。　　
+
+
+
+#  防抖 节流
+
+节流:一段时间内只执行一次,//持续出发并不会执行多次,到一定时间再去执行;
+防抖:
+
+**`apply()`** 方法调用一个具有给定`this`值的函数，以及作为一个数组（或[类似数组对象](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Indexed_collections#Working_with_array-like_objects)）提供的参数。
+
+`call()`方法接受的是**参数列表**，而`apply()`方法接受的是**一个参数数组**。
+
+```
+const numbers = [5, 6, 2, 3, 7];
+const max = Math.max.apply(null, numbers);//7
+```
+
+
+
+
+
+
+
+# axios文件下载
+
+axios返回结果可能是： excel文件流 或 json格式校验结果信息(记录数为0或超过10万条最大下载限制)
+
+ 
+
+```
+axios({
+  url:url,
+  method:'get',
+  responseType:'blob'
+}).then(function(resp){
+var headers = resp.headers;
+var data = resp.data;
+if(headers['content-type'].indexOf('json')>=0){
+  var reader = new FileReader();
+  reader.onload = function(){
+   var json = JSON.parse(this.result);
+   let {retCode,retMsg} = json;
+   if(retCode!='200'){
+    layer.msg(retMsg,{icon:2,zIndex:layer.zIndex})
+   }
+   reader.readAsText(data)
+  }
+}else{
+     var fileName = headers['content-disposition'].math(/filename=(.*)/)[1];
+     // 二进制流转换为blob
+     var blob = new Blob([data],{type:'applicaiton/vdn.ms-excel;charset=utf-8'})
+  if (typeof window.navigator.msSaveBlob !== 'undefined') {
+      // 兼容IE，window.navigator.msSaveBlob：以本地方式保存文件
+      window.navigator.msSaveBlob(blob, decodeURI(filename))
+  }else{
+     var blobURL = window.URL.createObjectURL(blob)
+     var eleLink = document.createElement('a')
+     eleLink.download = decodeURI(fileName);
+     eleLink.href = blobURL;
+
+     if(typeof eleLink.download === 'undefined'){
+       // 兼容 某些浏览器不支持 html5 download 属性
+       eleLink.setAttrribute('target','_blank');
+     }
+     document.body.appendChild(eleLink)
+     eleLink.click();
+     document.body.removeChild(eleLink)
+     window.URL.revokeObjectURL(blobURL);
+  }   
+} 
+})
+ 
+```
+
+
+
+# IntersectionObserver  
+
+常常需要了解某个元素是否进入了"视口"（viewport），即用户能不能看到它。
+
+​        [IntersectionObserver](https://github.com/w3c/IntersectionObserver)/**polyfill**/      
 
 # [ES6](https://es6.ruanyifeng.com/)
 
@@ -545,10 +864,11 @@ arr.slice([begin[, end]])
 (...args)
 es6 语法 多个变量赋值给args数组
 
-# 快速声明一个数组，长度为 100，元素全是 0 
+快速声明一个数组，长度为 100，元素全是 0
+
 var arr=new Array(100).fill(0);
 
-## shift() 方法从数组中删除第一个元素，并返回该元素的值。此方法更改数组的长度。
+shift() 方法从数组中删除第一个元素，并返回该元素的值。此方法更改数组的长度。
 
 
 

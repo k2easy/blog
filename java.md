@@ -2678,3 +2678,285 @@ WebMvcConfigurer createWebMvcConfigurer(@Autowired HandlerInterceptor[] intercep
 
 
 
+# IO
+
+构造File对象时，既可以传入绝对路径，也可以传入相对路径。
+
+```
+File f = new File("C:\\Windows\\notepad.exe");
+```
+
+注意Windows平台使用`\`作为路径分隔符，在Java字符串中需要用`\\`表示一个`\`。Linux平台使用`/`作为路径分隔符,File.separator
+
+可以用`.`表示当前目录，`..`表示上级目录。
+
+File对象有3种形式表示的路径，一种是`getPath()`，返回构造方法传入的路径，一种是`getAbsolutePath()`，返回绝对路径，一种是`getCanonicalPath`，它和绝对路径类似，但是返回的是规范路径。
+
+`File`对象既可以表示文件，也可以表示目录。特别要注意的是，构造一个`File`对象，即使传入的文件或目录不存在，代码也不会出错，因为构造一个`File`对象，并不会导致任何磁盘操作。只有当我们调用`File`对象的某些方法的时候，才真正进行磁盘操作。
+
+调用`isFile()`，判断该`File`对象是否是一个已存在的文件，调用`isDirectory()`，判断该`File`对象是否是一个已存在的目录
+
+判断File对象 文件的权限和大小：
+
+- `boolean canRead()`：是否可读；
+- `boolean canWrite()`：是否可写；
+- `boolean canExecute()`：是否可执行；
+- `long length()`：文件字节大小。
+
+对目录而言，是否可执行表示能否列出它包含的文件和子目录。
+
+```
+File file = new File("/path/to/file");
+if (file.createNewFile()) {
+    // 文件创建成功:
+    // TODO:
+    if (file.delete()) {
+        // 删除文件成功:
+    }
+}
+```
+
+有些时候，程序需要读写一些临时文件，File对象提供了`createTempFile()`来创建一个临时文件，以及`deleteOnExit()`在JVM退出时自动删除该文件。
+
+```
+public class Main {
+    public static void main(String[] args) throws IOException {
+        File f = File.createTempFile("tmp-", ".txt"); // 提供临时文件的前缀和后缀
+        f.deleteOnExit(); // JVM退出时自动删除
+        System.out.println(f.isFile());
+        System.out.println(f.getAbsolutePath());
+    }
+}
+
+```
+
+当File对象表示一个目录时，可以使用`list()`和`listFiles()`列出目录下的文件和子目录名。`listFiles()`提供了一系列重载方法，可以过滤不想要的文件和目录：
+
+```
+File f = new File("C:\\Windows");
+        File[] fs1 = f.listFiles(); // 列出所有文件和子目录
+        printFiles(fs1);
+        File[] fs2 = f.listFiles(new FilenameFilter() { // 仅列出.exe文件
+            public boolean accept(File dir, String name) {
+                return name.endsWith(".exe"); // 返回true表示接受该文件
+            }
+        });
+```
+
+File对象如果表示一个目录，可以通过以下方法创建和删除目录：
+
+- `boolean mkdir()`：创建当前File对象表示的目录；
+- `boolean mkdirs()`：创建当前File对象表示的目录，并在必要时将不存在的父目录也创建出来；
+- `boolean delete()`：删除当前File对象表示的目录，当前目录必须为空才能删除成功。
+
+### Path
+
+Java标准库还提供了一个`Path`对象，它位于`java.nio.file`包。
+
+如果需要对目录进行复杂的拼接、遍历等操作，使用`Path`对象更方便。
+
+```
+Path p1 = Paths.get(".", "project", "study"); // 构造一个Path对象
+Path p2 = p1.toAbsolutePath(); // 转换为绝对路径
+File f = p3.toFile(); // 转换为File对象
+for (Path p : Paths.get("..").toAbsolutePath()) { // 可以直接遍历Path
+  System.out.println("  " + p);
+}
+```
+
+如果不指定参数，则使用当前目录，如果指定参数，则使用指定目录。
+
+#### InputStream
+
+`nputStream`就是Java标准库提供的最基本的输入流
+InputStream`并不是一个接口，而是一个抽象类，它是所有输入流的超类。这个抽象类定义的一个最重要的方法就是`int read()
+
+```
+public abstract int read() throws IOException;
+这个方法会读取输入流的下一个字节，并返回字节表示的int值（0~255）。如果已读到末尾，返回-1表示不能继续读取了。
+```
+
+`FileInputStream`是`InputStream`的一个子类。顾名思义，`FileInputStream`就是从文件流中读取数据
+
+```
+public void readFile() throws IOException {
+    InputStream input = null;
+    try {
+        input = new FileInputStream("src/readme.txt");
+        int n;
+        while ((n = input.read()) != -1) { // 利用while同时读取并判断
+            System.out.println(n);
+        }
+    } finally {
+        if (input != null) { input.close(); }
+    }
+}
+
+```
+
+在计算机中，类似文件、网络端口这些资源，都是由操作系统统一管理的。应用程序在运行的过程中，如果打开了一个文件进行读写，完成后要及时地关闭，以便让操作系统把资源释放掉，否则，应用程序占用的资源会越来越多，不但白白占用内存，还会影响其他应用程序的运行。
+
+在读取或写入IO流的过程中，可能会发生错误，例如，文件不存在导致无法读取，没有写权限导致写入失败，等等，这些底层错误由Java虚拟机自动封装成`IOException`异常并抛出。因此，所有与IO操作相关的代码都必须正确处理`IOException`。
+
+用`try ... finally`来编写上述代码会感觉比较复杂，更好的写法是利用Java 7引入的新的`try(resource)`的语法，只需要编写`try`语句，让编译器自动为我们关闭资源。
+
+```
+public void readFile() throws IOException {
+    try (InputStream input = new FileInputStream("src/readme.txt")) {
+        int n;
+        while ((n = input.read()) != -1) {
+            System.out.println(n);
+        }
+    } // 编译器在此自动为我们写入finally并调用close()
+} 
+```
+
+编译器只看`try(resource = ...)`中的对象是否实现了`java.lang.AutoCloseable`接口，如果实现了，就自动加上`finally`语句并调用`close()`方法。`InputStream`和`OutputStream`都实现了这个接口，因此，都可以用在`try(resource)`中。
+
+### 缓冲
+
+在读取流的时候，一次读取一个字节并不是最高效的方法。很多流支持一次性读取多个字节到缓冲区，对于文件和网络流来说，利用缓冲区一次性读取多个字节效率往往要高很多
+
+```
+public void readFile() throws IOException {
+    try (InputStream input = new FileInputStream("src/readme.txt")) {
+        // 定义1000个字节大小的缓冲区:
+        byte[] buffer = new byte[1000];
+        int n;
+        while ((n = input.read(buffer)) != -1) { // 读取到缓冲区
+            System.out.println("read " + n + " bytes.");
+        }
+    }
+}
+```
+
+### 阻塞
+
+在调用`InputStream`的`read()`方法读取数据时，我们说`read()`方法是阻塞（Blocking）的。
+
+```
+int n;
+n = input.read(); // 必须等待read()方法返回才能执行下一行代码
+int m = n;
+```
+
+执行到第二行代码时，必须等`read()`方法返回后才能继续。因为读取IO流相比执行普通代码，速度会慢很多，因此，无法确定`read()`方法调用到底要花费多长时间。
+
+
+
+### InputStream实现类
+
+`ByteArrayInputStream`可以在内存中模拟一个`InputStream`：
+
+```
+        byte[] data = { 72, 101, 108, 108, 111, 33 };
+        try (InputStream input = new ByteArrayInputStream(data)) {
+            int n;
+            while ((n = input.read()) != -1) {
+                System.out.println((char)n);
+            }
+        }
+```
+
+
+
+
+
+#### OutputStream
+
+是所有输出流的超类。这个抽象类定义的一个最重要的方法就是`void write(int b)`，签名如下：
+
+```
+public abstract void write(int b) throws IOException;
+```
+
+`OutputStream`还提供了一个`flush()`方法，它的目的是将缓冲区的内容真正输出到目的地。
+
+为什么要有`flush()`？因为向磁盘、网络写入数据的时候，出于效率的考虑，操作系统并不是输出一个字节就立刻写入到文件或者发送到网络，而是把输出的字节先放到内存的一个缓冲区里（本质上就是一个`byte[]`数组），等到缓冲区写满了，再一次性写入文件或者网络。对于很多IO设备来说，一次写一个字节和一次写1000个字节，花费的时间几乎是完全一样的，所以`OutputStream`有个`flush()`方法，能强制把缓冲区内容输出。
+
+通常情况下，我们不需要调用这个`flush()`方法，因为缓冲区写满了`OutputStream`会自动调用它，并且，在调用`close()`方法关闭`OutputStream`之前，也会自动调用`flush()`方法。
+
+但是，在某些情况下，我们必须手动调用`flush()`方法。举个栗子：在线聊天软件 发送消息
+
+```
+    try (OutputStream output = new FileOutputStream("out/readme.txt")) {
+        output.write("Hello".getBytes("UTF-8")); // Hello
+    } // 编译器在此自动为我们写入finally并调用close()
+```
+
+### 阻塞
+
+和`InputStream`一样，`OutputStream`的`write()`方法也是阻塞的。
+
+
+
+### 构造函数
+
+SpringBoot问题之org.apache.ibatis.executor.ExecutorException: No constructor found in...
+
+报这个问题是因为在实体类中定义了有参构造函数，但是忽略了无参构造函数的定义，所以在执行查询的时候会报如下错误：比如创造了一个带有参数的构造方法，那么无参的构造方法必须显式的写出来，否则会编译失败"这句话有点不妥，应该这么理解：每个类至少要有一个构造函数，如果你自己构建了一个带有参数的构造函数而没有再显示的写出无参的构造函数也是可以的，不过当你尝试通过一个无参的构造函数来构建（new）时，此时编译器才会报错，因为找不到这个无参的构造函数。也就是说当一个类你没有给他构造函数，则编译器会自动补上一个无参的，若有的话就不会，你需要显示将此无参的构造函数写出来。
+	所以在创建某个实体类的时候，应该养成一个好习惯，显示构造一个无参构造函数，这样就会避免后面遇到的奇葩问题了。 
+
+
+
+
+
+
+
+# RESTFUL API
+
+REST API中的资源一定需要是复数名词如users，在很多情况下，API 中的资源与你的数据模型（也就是数据库的表）是一一对应的。当然也有例外情况，比如说你的数据库中存有用户，但是你现在想要让调用者可以创建“管理员”，那么 API 可能是 POST /admins，然而，你的表中并没有 `admins` 这个表，而是否是 admin 是 Users 表中的一个属性，比如 `role=admin`。
+
+- `GET /tickets` - 列出所有车票
+- `GET /tickets/9839` - 列出 id 为 9839 这张车票的信息
+- `POST /tickets` - 创建一张车票
+- `PUT /tickets/9839` - 更新 9839 这张车票的信息
+- `PATCH /tickets/9839` - 部分修改 983 这张车票的信息，比如只修改车票价格
+- `DELETE /tickets/9839` - 删掉 9839 这张车票
+
+如果需要调用一张车票的信息，你的调用者自然会知道应该用GET去查看一个车票资源的信息，即 `GET /tickets/:ticketId`。这样就极大降低了沟通成本和出错成本，提升效率。
+
+
+
+有时候，当我们试图表达一些接口时，会发现REST的准则很难直接应用。比如说，当你需要一个接口让用户登录时
+
+```
+POST /users/signin
+```
+
+1. 如果你希望严格地遵循 REST 原则，那么你需要找一个替代动词的名词。比如说，这里的 `signin` 可以替换为`login`。或者，如果你是以 token 密钥的方式登录的话，也许可以改为 `POST /users/token`，即创建一个 user token(也就是登录了)
+2. 在某些实在困难的地方，放弃严格的REST原则
+3. 参考一些成功的 REST API 并寻找类似的 API，参考他们的命名设计
+
+
+
+如果在大致将 v1 开发完毕后，v1 前缀的 API 就应该稳定下来，所有的改动进入 v2。同时你应该开始通知所有使用 v1 的用户，给他们几周到几个月的时间，帮助他们平滑迁移到 v2
+
+带有版本前缀的 API 示例如下
+
+```curl
+GET /v1/indexes/
+GET /v1/indexes/abc/
+POST /v1/indexes/
+```
+
+建议 REST API 永远返回 JSON 格式的结果。
+
+原因有几个：
+
+首先，JSON 作为互联网上使用最广泛的格式，在几乎任何语言的任何框架中都有广泛的支持。
+
+同时，由于其高度的可读性，如果需要阅读返回内容，JSON 会让你的调用者阅读起来方便很多。
+
+最后，JSON 的高压缩率可以在需要时方便地帮你提升传输效率和速度。
+
+
+
+在返回你的 REST API 结果时，我们建议打开 Gzip 和 Pretty print 两个选项。
+
+在目前的普通手机算力已经接近十几年前的顶配计算机的前提下，CPU 不再是运算的瓶颈。而网络带宽的扩宽速度则远没有追上 CPU  变快的速度。因此，如果有可能的话，用 CPU 的时间换取网络的传输时间是非常值得的。这也就是说，打开默认 Gzip 压缩，会让你的 JSON  结果耗费少量的服务器 CPU，但却能大大加快传输速度。
+
+虽然打开 Pretty print 会增加一些空白字符进行格式化，但是由于打开 Gzip 压缩，这些空白字符所占用的空间都会被压缩掉，所以并不用担心网络传输时，JSON 变得更大更慢。
+
+API的英文即**A**pplication **P**rogramming **I**nterface首字母的缩写，程序之间的接口。
+
