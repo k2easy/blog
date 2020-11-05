@@ -1167,15 +1167,395 @@ git pull origin master --allow-unrelated-histories
 
 
 
+# 廖雪峰 git》
+
+```
+$ git diff readme.txt 
+```
+
+顾名思义就是查看difference，显示的格式正是Unix通用的diff格式。
+
+## 版本回退
+
+git log //查看commit id 
+git log --pretty=oneline
+git reset --hard HEAD^ //把工作目录中的文件回退到上一个版本
+git 类似 游戏存档 恢复
+
+```ascii
+┌────┐
+│HEAD│
+└────┘
+   │
+   │    ○ append GPL
+   │    │
+   └──> ○ add distributed
+        │
+        ○ wrote a readme file
+```
+
+在Git中，总是有后悔药可以吃的。当你用`$ git reset --hard HEAD^`回退到`add distributed`版本时，再想恢复到`append GPL`，就必须找到`append GPL`的commit id。Git提供了一个命令`git reflog`用来记录你的每一次命令：
+
+## 工作区 暂存区
+
+![git-repo](https://www.liaoxuefeng.com/files/attachments/919020037470528/0)
+
+工作区有一个隐藏目录`.git`，这个不算工作区，而是Git的版本库。
+
+Git的版本库里存了很多东西，其中最重要的就是称为stage（或者叫index）的暂存区，还有Git为我们自动创建的第一个分支`master`，以及指向`master`的一个指针叫`HEAD`。
+
+第一步是用`git add`把文件添加进去，实际上就是把文件修改添加到暂存区；
+
+第二步是用`git commit`提交更改，实际上就是把暂存区的所有内容提交到当前分支。
+
+因为我们创建Git版本库时，Git自动为我们创建了唯一一个`master`分支，所以，现在，`git commit`就是往`master`分支上提交更改。
+
+可以简单理解为，需要提交的文件修改通通放到暂存区，然后，一次性提交暂存区的所有修改。
+
+ 
+
+## 撤销修改 checkout
+
+git checkout -- readme.md
+如果暂存区有该文件内容，则把暂存区该文件内容覆盖到工作区。如果暂存区没有该文件，则把版本库中的该文件覆盖到工作区。
+
+git reset HEAD readme.md 
+把版本库中的readme.md覆盖到暂存区（即unstage），再使用 git checkout -- readme.md 从暂存区覆盖到工作目录。  
+
+`--`很重要，没有`--`，就变成了“切换到另一个分支”的命令，
+
+ 
+
+ 
+
+
+
+## 比较diff
+
+git diff readme.md  ; // 暂存区 与 工作区 比较，如果暂存区为空 则与仓库文件比较
+
+git diff HEAD -- readme.md  // 版本库与工作区比较 
+
+git diff --cached readme.md  // 查看 暂存区与版本库的差异比较  `--staged` 和 `--cached` 是同义词
+
+git diff 本身只显示尚未暂存的改动，而不是自上次提交以来所做的所有改动。 有时候你一下子暂存了所有更新过的文件，运行 `git diff` 后却什么也没有，就是这个原因。
+
+`git commit` 加上 `-a` 选项，Git 就会自动把所有已经跟踪过的文件暂存起来一并提交，从而跳过 `git add` 步骤。
+
+paper is cheap ,code& react is  true value;
+
+## 重命名
+
+重命名文件后，
+需要 git mv README.md readme.md
+
+git diff --help
+
+git diff readme.md
+
+
+
+移动文件
+$ git mv file_from file_to
+相当于
+$ mv README.md README
+$ git rm README.md
+$ git add README
+
+## 删除文件
+
+本地文件 rm test.txt后
+git rm test.txt //告诉git从版本库中删除该文件
+git commit -m 'delete test.txt'； //并做提交
+
+从 Git 中移除某个文件，就必须要**从已跟踪文件清单中移除**（确切地说，是从暂存区域移除），下一次提交时，该文件就不再纳入版本管理了。git rm reade.md
+如果文件已经修改 ,加上-f强制删除。 $ git rm --cached README
+
+当你忘记添加 `.gitignore` 文件，不小心把大堆日志文件添加到暂存区时  $ git rm log/\*.log
+
+## 查看历史
+
+git log 
+git log --pretty=oneline
+
+$ git log --pretty=format:"%h %s" --graph
+
+$ git log --since=2.weeks    // “2020-01-01”  
+
+## 追加提交
+
+$ git commit -m 'initial commit'
+$ git add forgotten_file
+$ git commit --amend
+
+## 远程提交
+
+本地Git仓库和GitHub仓库之间的传输是通过SSH加密的，需要使用ssh key.
+
+```
+$ssh-keygen -t rsa -C "abc@qq.com"
+```
+
+在`.ssh`目录下生成`id_rsa`和`id_rsa.pub`两个文件
+
+Github>Account settings>add ssh key >id_rsa.pub
+
+
+
+可以从这个仓库克隆出新的仓库，也可以把一个已有的本地仓库与之关联，然后，把本地仓库的内容推送到GitHub仓库。
+$git remote add origin git@github.com:michaelliao/learngit.git  // origin 远程仓库的名称
+$ git push -u origin master //把本地仓库master分支推送到远程仓库master分支
+
+**由于远程库是空的，我们第一次推送`master`分支时，加上了`-u`参数**，Git不但会把本地的`master`分支内容推送的远程新的`master`分支，还会把本地的`master`分支和远程的`master`分支关联起来，在以后的推送或者拉取时就可以简化命令。
+
+
+
+HEAD指针指向当前所在分支
+![git-br-dev-fd](https://www.liaoxuefeng.com/files/attachments/919022387118368/l)
+
+假如我们在`dev`上的工作完成了，就可以把`dev`合并到`master`上。Git怎么合并呢？最简单的方法，就是直接把`master`指向`dev`的当前提交，就完成了合并：fast-forward
+
+![git-br-ff-merge](https://cdn.jsdelivr.net/gh/k2easy/picgo/2020/11/0520201105110525.png)
+
+```
+git checkout -b dev
+-b参数表示创建并切换
+相当于
+$ git branch dev  
+$ git checkout dev
+
+
+echo 'dev 1111'>>dev.md
+git add dev.md
+git commit -m 'dev.md'
+
+git log //能看到 dev.md 提交记录
+git checkout 
+```
+
+用`git branch`命令查看当前分支：当前分支前面会标一个`*`号。
+
+切换回`master`分支后，再查看一个`readme.txt`文件，**刚才添加的内容不见了**！因为那个提交是在`dev`分支上，而`master`分支此刻的提交点并没有变：
+
+```
+$ git merge dev // 合并指定分支到当前分支
+Fast-forward // 快进模式”，也就是直接把master指向dev的当前提交
+```
+
+git branch 查看所有分支
+
+git branch -d dev // 合并完成后，就可以放心地删除`dev`分支了
+
+## switch
+
+切换分支使用`git checkout <branch>`
+撤销修改则是`git checkout -- <file>`，同一个命令有两种作用，有点令人迷惑。
+
+最新版本的Git提供了新的`git switch`命令来切换分支：
+$ git switch -c dev // -c create
+
+使用新的`git switch`命令，比`git checkout`要更容易理解。
+
+## 解决冲突
+
+![git-br-feature1](https://www.liaoxuefeng.com/files/attachments/919023000423040/0)
+
+两个分支都修改了同一个文件，可能产生冲突
+这种情况下，Git无法执行“快速合并”，只能试图把各自的修改合并起来，但这种合并就可能会有冲突，
+
+```
+$ git merge feature1
+Auto-merging readme.txt
+CONFLICT (content): Merge conflict in readme.txt
+Automatic merge failed; fix conflicts and then commit the result.
+```
+
+`git status`也可以告诉我们冲突的文件
+
+打开查看 readme.txt
+Git用`<<<<<<<`，`=======`，`>>>>>>>`标记出不同分支的内容，修改后再提交
+
+```
+$ git add readme.txt 
+$ git commit -m "conflict fixed"
+[master cf810e4] conflict fixed
+```
+
+![git-br-conflict-merged](https://www.liaoxuefeng.com/files/attachments/919023031831104/0)
+
+git log --graph   // 分支图
+
+## 分支管理策略
+
+通常，合并分支时，如果可能，Git会用`Fast forward`模式，但这种模式下，删除分支后，会丢掉分支信息。
+如果要强制禁用`Fast forward`模式，Git就会在merge时生成一个新的commit，这样，从分支历史上就可以看出分支信息。
+
+```
+$ git merge --no-ff -m "merge with no-ff" dev
+```
+
+![git-no-ff-mode](https://www.liaoxuefeng.com/files/attachments/919023225142304/0)
+
+在实际开发中:
+
+`master`分支应该是非常稳定的，也就是仅用来发布新版本，平时不能在上面干活；
+
+比如1.0版本发布时，再把`dev`分支合并到`master`上，在`master`分支发布1.0版本；
+每个人都在`dev`分支上干活，每个人都有自己的分支，时不时地往`dev`分支上合并就可以了
+![git-br-policy](https://www.liaoxuefeng.com/files/attachments/919023260793600/0)
+
+
+
+## Bug分支
+
+当你接到一个修复一个代号101的bug的任务时，很自然地，你想创建一个分支`issue-101`来修复它，但是，等等，当前正在`dev`上进行的工作还没有做完无法提交。
+`stash`功能，可以把当前工作现场“储藏”起来，等以后恢复现场后继续工作。
+
+当前工作没有做完，master分支和当前分支文件差异不同，不能在当前分支修改bug。
+
+cherry樱桃树 ，做某件事的另一次机会
+cherry pick 摘樱桃
+
+git stash // stash 藏匿处 藏匿物 
+git status //工作区 是干净的,除非未跟踪的文件
+git checkout master
+git checkout -b issue-101
+// modify
+git commit -m 'fix bug 101'
+git switch master
+git merge --no-ff -m 'merge bug fix 101'  issue-101
+git switch dev
+git status 
+git stash list 
+
+一是用`git stash apply`恢复，但是恢复后，stash内容并不删除，你需要用`git stash drop`来删除；
+另一种方式是用`git stash pop`，恢复的同时把stash内容也删
+git stash pop
+可以多次stash，恢复的时候，先用`git stash list`查看，然后恢复指定的stash
+git stash apply stash@{0}
+
+
+
+在master分支上修复了bug，但是dev分支并没有合并 issue-101分支
+可以把`4c805e2 fix bug 101`这个提交所做的修改“复制”到dev分支，并不是把整个master分支merge过来。
+
+`cherry-pick`命令，让我们能复制一个特定的提交到当前分支
+git switch dev
+git cherry-pick 4c805e2 // [master 1d4b803] fix bug 101
+Git自动给dev分支做了一次提交
+
+也可以 直接在dev分支上修复bug，然后在master分支上“重放”
+
+## Feature分支
+
+添加一个新功能时，你肯定不希望因为一些实验性质的代码，把主分支搞乱了，所以，每添加一个新功能，最好新建一个feature分支，在上面开发，完成后，合并，最后，删除该feature分支。
+
+```
+git branch -d feature-vulcan
+```
+
+`feature-vulcan`分支还没有被合并，如果删除，将丢失掉修改，如果要强行删除，需要使用大写的`-D`参数。。
+git branch -D feature-vulcan
+
+## 多人协作
+
+git remote -v
+git push origin dev;//把本地dev分支推送到远程仓库
+
+
+
+当你的小伙伴从远程库clone时，默认情况下，你的小伙伴只能看到本地的`master`分支。
+$ git checkout -b dev origin/dev  
+创建远程 origin/dev 分支到本地dev
+
+
+
+多人协作的工作模式通常是这样：
+
+1. 首先，可以试图用`git push origin <branch-name>`推送自己的修改；
+2. 如果推送失败，则因为远程分支比你的本地更新，需要先用`git pull`试图合并；
+3. 如果合并有冲突，则解决冲突，并在本地提交；
+4. 没有冲突或者解决掉冲突后，再用`git push origin <branch-name>`推送就能成功！
+
+如果`git pull`提示`no tracking information`，则说明本地分支和远程分支的链接关系没有创建，用命令`git branch --set-upstream-to <branch-name> origin/<branch-name>`。
+
+
+
+## rebase
+
+多人在同一个分支上协作时，很容易出现冲突。即使没有冲突，后push的童鞋不得不先pull，在本地合并，然后才能push成功。log 分支图较乱，不好看。
+
+是可以选一个分支中一个或者几个commit来应用提交到另外一个分支，操作单元是commit 不是branch
+
+<img src="https://cdn.jsdelivr.net/gh/k2easy/picgo/2020/11/0520201105181614.png" alt="img" style="zoom:50%;" />merge
+
+<img src="https://cdn.jsdelivr.net/gh/k2easy/picgo/2020/11/0520201105181625.png" alt="img" style="zoom:50%;" />rebase
+
+
+
+rebase操作的特点：把分叉的提交历史“整理”成一条直线，看上去更直观。缺点是本地的分叉提交已经被修改过了。
 
 
 
 
 
+## tag
+
+git tag v1.0
+git tag -a v1.0 -m "first release"  1094adb
+git tag // list
+git show v1.0 //detail
+$ git tag -d v0.1 //删除标签
+git push origin v1.0 // 推送某个标签到远程
+git push origin --tags // 一次性推送全部尚未推送到远程的本地标签：
+
+```
+$ git push origin :refs/tags/v0.9 //删除远程仓库的标签
+```
+
+Github访问它的项目主页https://github.com/twbs/bootstrap，点“Fork”就在自己的账号下克隆了一个bootstrap仓库，然后，从自己的账号下clone：
+
+```
+git clone git@github.com:michaelliao/bootstrap.git
+```
+
+这样你才能推送修改。如果从bootstrap的作者的仓库地址`git@github.com:twbs/bootstrap.git`克隆，因为没有权限，你将不能推送修改。
+
+如果你希望bootstrap的官方库能接受你的修改，你就可以在GitHub上发起一个pull request。当然，对方是否接受你的pull request就不一定了。
+
+## Gitee
+
+5人以下小团队免费。不会像github一样偶尔被墙 ，访问速度慢
+
+## SourceTree
+
+图形界面
 
 
 
+## 规范
 
+### commit规范
 
+```
 
+Present-tense summary under 50 characters 简要描述
+* 详细描述
+* More information about commit (under 72 characters).
+* More information about commit (under 72 characters).
+
+http://project.management-system.com/ticket/123 bug网址
+
+```
+
+分支的开发过程中，要经常与主干保持同步。
+
+```bash
+$ git fetch origin
+$ git rebase origin/master
+```
+
+### 合并commit
+
+分支开发完成后，很可能有一堆commit，但是合并到主干的时候，往往希望只有一个（或最多两三个）commit，这样不仅清晰，也容易管理。$ git rebase -i origin/master
 
