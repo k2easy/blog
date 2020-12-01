@@ -1,14 +1,15 @@
 
 
+# css 属性
 
 
 
+## background-image
 
-
-# background-image
  are drawn on stacking context layers on top of each other. The first layer specified is drawn as if it is closest to the user.
- 
-# [sticky](http://www.ruanyifeng.com/blog/2019/11/css-position.html)
+
+## [sticky](http://www.ruanyifeng.com/blog/2019/11/css-position.html)
+
 static是position属性的默认值。如果省略position属性，浏览器就认为该元素是static定位。
 这时，浏览器会按照源码的顺序，决定每个元素的位置，这称为"正常的页面流"（normal flow）。每个块级元素占据自己的区块（block），元素与元素之间不产生重叠，这个位置就是元素的默认位置。
 - relative、absolute、fixed这三个属性值有一个共同点，都是相对于某个基点的定位，不同之处仅仅在于基点不同.
@@ -35,8 +36,8 @@ th {
 不能设在<thead>和<tr>元素，因为这两个元素没有relative定位，也就无法产生sticky效果。
 ```
 
+# 《CSS世界》
 
-# CSS世界
 # 术语
 功能符 rgba() hsla() url('.png') attr('href') scale(-1)
 长度单位：相对字体长度单位 em ex rem ch(字符0的宽度)、相对视区长度单位vh vw vmin vmax。绝对单位px
@@ -295,7 +296,7 @@ img[src]{visibility:visible;}
 图片css尺寸能够影响图片显示的宽高，是因为图片默认填充声明是 object-fit:fill. 如果修改为object-fill:none则图片尺寸完全不受控制。
 
 boject-fit:contain ，保持图片比例 显示完整。
- 
+
 
 
 
@@ -344,3 +345,40 @@ background-size: 6px, auto, contain
 
 percentage 值，指定背景图片相对背景区（background positioning area）的百分比。背景区由background-origin设置，默认为盒模型的内容区与内边距，也可设置为只有内容区，或者还包括边框。如果attachment 为fixed，背景区为浏览器可视区（即视口），不包括滚动条。不能为负值。
 auto
+
+
+
+
+
+# [Build Responsive Real World Websites with HTML5 and CSS3》](https://www.udemy.com/course/design-and-develop-a-killer-website-with-html5-and-css3/?utm_campaign=website1010&utm_medium=website1010&utm_source=mycoupon)
+
+## response web design
+
+fluid layout 
+media queries 
+responsive images
+correct unit: font size ,element dimensions   
+desktop-first vs mobile-first
+
+### maintainable and scalable code 
+
+clean code 
+easy understand 
+growth
+resuabele
+how to organize files 
+how to name classes
+how to sructure html 
+
+### web performance
+
+faster & smaller
+less http request
+less code 
+compress code 
+use a  css preprocessor ,sass
+less image
+compress images 
+
+ 
+

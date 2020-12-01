@@ -122,6 +122,9 @@ C. 将参数绑定在单元格上（无法移除参数）
 
 
 
+
+
+
 	 电子表格拖拽字段到表格上后，字段的左父格和上父格都默认为“ 有
 	
 	 电子表格中为了让标题行在分页之后的每一页都还可以继续显示，C. 设置打印标题
@@ -3696,4 +3699,196 @@ Sheet2 中创建好清单报表，复制，sheet1右键 选择行粘贴，照相
 ![img](https://wiki.smartbi.com.cn/download/attachments/47494481/image2019-11-25 14%3A51%3A59.png?version=1&modificationDate=1574664722000&api=v2)
 
 ![img](https://wiki.smartbi.com.cn/download/attachments/47494481/image2019-11-25 15%3A9%3A5.png?version=1&modificationDate=1574665748000&api=v2)
+
+
+
+
+
+\```//获取D2单元格`
+
+```
+  ``var` `td = spreadsheetReport.getCell(1, 3);
+  ``//添加按钮
+  ``td.innerHTML = ``"<input type='button' value='新按钮'>"``;
+  ``td.firstChild.onclick = ``function``() {
+    ``alert(``"添加按钮成功！"``);
+  ``}
+```
+
+```
+   //获取B5单元格字段扩展出来的数据
+    var Pos = spreadsheetReport.getExpandedPositions("B5");
+    //获取B5单元格中字段扩展出的数据的最后一行行号
+    var lastRow = spreadsheetReport.parseCellIndex(Pos[Pos.length - 1])[0];
+    //获取B5单元格数据下的一行，第二列的数据，从0开始计数，因此坐标为lastRow+1,1
+    var td = spreadsheetReport.getCell(lastRow + 1, 1);
+```
+
+
+
+```
+function main(spreadsheetReport) {
+    var that = spreadsheetReport.spreadsheetReportWriteBack;
+    that.__new_doSaveClick = function() {
+        windowAlert("电子表格点击保存按钮触发宏事件!");
+        this.doSaveClick();
+    }
+    that.removeListener(that.elem_btnSave, "click", that.doSaveClick, that);
+    that.addListener(that.elem_btnSave, "click", that.__new_doSaveClick, that);
+}
+```
+
+
+
+# 常见宏代码
+
+ 1、柱形图 高亮
+
+
+    function main(chartView) {
+        var biChart = chartView.getChartObject();
+        var option = biChart.getOptions();
+
+
+​        
+        var gridData = chartView.getGridData();
+        var data = gridData.data;
+        
+        var maxIndex=0,minIndex=0;
+        data.forEach(function(arr,i){
+            let name = arr[0].value;
+            let value = arr[1].value;
+            if(value>data[maxIndex][1].value){
+                maxIndex = i ;
+            }
+            if(value<data[minIndex][1].value){
+                minIndex=i;
+            }
+        }) 
+        
+       var optionData= option.series[0].data;
+    
+       if(optionData){  
+              optionData[maxIndex].itemStyle={
+                  normal:{
+                      borderWidth:5,
+                      borderColor:'green'
+                  }
+              }
+            optionData[minIndex].itemStyle={
+                  normal:{
+                      borderWidth:5,
+                      borderColor:'green'
+                  }
+              } 
+       }
+       
+       setTimeout(function(){
+            var eChart = biChart.getChart();
+            eChart.setOption(option)
+    
+       },0)
+       
+    }
+2、柱形图 轮播 
+
+```
+function main(chartView) {
+    var biChart = chartView.getChartObject();
+    var option = biChart.getOptions();
+    var eChart = biChart.getChart();
+
+    var gridData = chartView.getGridData();
+    var dataLen = gridData.data.length;
+    var chartType = chartView.chartType;
+
+    // highlight
+    option.series[0].emphasis = {
+        itemStyle: {
+            color: 'red',
+            borderColor: 'red'
+        }
+    }
+
+    //定时轮播
+    chartView.lunbo = {
+        index: 0,
+        howOften: 1000,
+        timeTicket: null,
+
+        startLoop: function() {
+            var that = this;
+            that.timeTicket = setInterval(function() { 
+                //取消高亮
+                eChart.dispatchAction({
+                    type: 'downplay',
+                    seriesIndex: 0
+                });
+
+                eChart.dispatchAction({
+                    type: 'highlight',
+                    seriesIndex: 0,
+                    dataIndex: that.index % dataLen
+                }); 
+                that.index++;
+            }, that.howOften)
+        },
+
+        stopLoop: function() {
+            clearInterval(this.timeTicket)
+        }
+    }
+
+    eChart.setOption(option);
+
+    chartView.lunbo.startLoop();
+
+    chartView.refresh = function(chartType, option, renew) {
+        chartView.lunbo.stopLoop();
+        chartView.lunbo.index = 0;
+        chartView.lunbo.startLoop();
+    }
+
+    chartView.destroy = function() {
+        chartView.lunbo.stopLoop();
+    }
+}
+```
+
+
+
+echarts地图边框阴影
+
+```
+       itemStyle: {
+            normal: {
+                areaColor: '#01215c',
+                borderWidth: 5, 
+                borderColor: '#9ffcff',
+                shadowColor: 'rgba(0,54,255, 1)',
+                shadowBlur: 15
+            }
+        }
+    },
+```
+
+
+
+ [echarts 设置地图外边框以及多个geo实现缩放拖曳同步](https://blog.csdn.net/m0_37294207/article/details/96879705)
+
+[3D地图边缘高亮](https://www.makeapie.com/editor.html?c=xrJdvs1oRx)
+
+ [echarts 设置地图外边框、地图背景渐变色和地图阴影,增加立体感以及在地图上打点](https://www.codenong.com/cs106099547/)
+
+
+
+参数传值
+
+从一个参数传值到另一个参数，并能查看其数据信息的设置。
+
+区域传值
+
+传值到某一个区域，如某个单元格。
+
+![img](https://wiki.smartbi.com.cn/download/attachments/49812988/image2020-2-21 16%3A37%3A16.png?version=1&modificationDate=1582274237000&api=v2)
 

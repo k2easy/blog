@@ -2960,3 +2960,32 @@ POST /v1/indexes/
 
 API的英文即**A**pplication **P**rogramming **I**nterface首字母的缩写，程序之间的接口。
 
+# tomcat
+
+### Tomcat error "No buffer space available (maximum connections reached)
+
+命令行  netstat -a 
+
+看到大量的 there are a large number stuck in states such as CLOSE_WAIT and TIME_WAIT. 
+
+Stopping and Restarting Tomcat usually fixes this. 
+
+For Windows see: http://support.microsoft.com/kb/196271
+
+The database administrator may need to explicitly close some idle connections to the database. 
+
+
+
+**由于大量的TIME_WAIT连接未被释放，导致占用的端口资源一直未被回收**，出现了缓冲区空间不足的问题，应用也总是自动断线。
+
+
+
+windows server 2008/windows 2007系统版本存在的一个bug，需要在系统中打如下补丁，方能解决问题。Windows  Server 2008 R2系统BUG导致windows缓冲区已满(no buffer  space),Windows核心套接字泄露问题导致操作系统套接字资源被耗尽,导致服务器与数据库无法正常对接。
+ ***解决方案：***
+ 1、**安装Windows kb2577795补丁—解决服务器windows缓冲区已满(no buffer space)的问题**
+ 2、**安装Windows kb2553549补丁—解决数据库服务器TCP连接不释放问题**
+ [补丁包下载](https://download.csdn.net/download/qq_28165595/10924452)
+
+
+
+，虽然重启服务器能够立马释放socket连接（注意这里不是重启tomcat服务器），但是这种方式只是治标不治本，这种问题后面可能还会出现，对于这种问题，应该从代码和硬件角度来考虑解决。首先代码中对于httpclient建立的连接应该及时关闭，同时还可以修改服务器的注册表，提高socket可用连接数，同时减少time-wait时间，让处于time-wait状态的连接尽快释放。

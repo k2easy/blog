@@ -287,6 +287,8 @@ pgguide=# \copy (select * from users where id=1)  TO '~/employ_1.tsv';
 psql "dbname=dbhere host=hosthere user=userhere password=pwhere port=5432 sslmode=require"
 ```
 
+## \d
+
  Running \? will give you a list of all available commands,
 
 \timing  开启查询用时
@@ -311,7 +313,7 @@ psql "dbname=dbhere host=hosthere user=userhere password=pwhere port=5432 sslmod
 
 \df *to_array* lists all functions that contain to_array in its name.函数查找
 
-
+\dt 只查看table ， \ds 只蝉看sequence序列
 
 ```
 -- Automatically format output based on result length and screen
@@ -465,7 +467,7 @@ Every query within Postgres has an execution plan when executed. There are three
 EXPLAIN ANALYZE SELECT last_name FROM employees where salary >= 50000;
 ```
 
-![image](https://cdn.jsdelivr.net/gh/k2easy/picgo/2020/11/0120201101100931.png)
+![image](https://cdn.jsdelivr.net/gh/k2easy/picgo/2020/11/0620201106135301.png)
 
 In this case we see there's a high time spent and a sequential scan. As a result we may want to try to add an index and examine the results:
 
@@ -706,6 +708,65 @@ comment on table test.id is '自增序列号,1~';
 
 ```
 
+查看该表的建表语句
+
+\d  users
+$ pg_dump -t 'public.users' --schema-only pgguide
+
+\d 显示列表 type包含 table ,sequence
+sequnce表是 建表时 id int serial产生的,sequence表是个自增器 ，类似mysql autoincrement。
+
+**Sequence** 使用的是整型数值，因此它的取值范围是 [-2147483647, 2147483647] 之间；//int 32
+`\ds` 命令只查看当前数据库的所有序列
+
+select * from user_id_sequence; // last_value ,long_cnt,is_called;
+
+### string_agg  
+
+```
+string_agg(expression, delimiter)
+直接把一个表达式变成字符串
+
+array_agg(expression)
+把表达式变成一个数组 一般配合 array_to_string() 函数使用
+```
+
+
+
+```
+select deptno, string_agg(ename, ',') from jinbo.employee group by deptno;
+
+ deptno |  string_agg  
+--------+--------------
+     20 | JONES
+     30 | ALLEN,MARTIN
+```
+
+```
+数组格式 array_agg
+select deptno, array_to_string(array_agg(ename),',') from jinbo.employee group by deptno;
+ deptno | array_to_string 
+--------+-----------------
+     20 | JONES
+     30 | ALLEN,MARTIN
+     
+select deptno, array_agg(ename) from jinbo.employee group by deptno;
+ deptno |   array_agg    
+--------+----------------
+     20 | {JONES}
+     30 | {ALLEN,MARTIN}
+     
+select deptno, (array_agg(ename order by hiredate asc))[1] from jinbo.employee group by deptno;
+ deptno | array_agg 
+--------+-----------
+     20 | JONES
+     30 | ALLEN
+```
+
+
+
+
+
 
 
 # Arrays
@@ -864,9 +925,9 @@ WHERE
 
  
 
-# cn/docs
+# postgre.cn》
 
-www.postgres.cn/docs/12/tutorial-start.html
+http://www.postgres.cn/docs/12/
 
 ```shell
 createdb mydb
@@ -1160,5 +1221,268 @@ Mint：就是Ubuntu帶個面具
 
 
 
-where   record ~ '^[^0-9]+$'; //不包含数字的🔢
+where   record ~ '^[^0-9]+$'; //不包含数字的
+
+
+
+# SQL 语言
+
+## 字符串常量
+
+当字符串中包含了很多单引号或反斜线时很难理解它，因为每一个都需要被双写。要在这种情形下允许可读性更好的查询，PostgreSQL提供了另一种被称为“美元引用”的方式来书写字符串常量。
+一个美元引用的字符串常量由一个美元符号（`$`）、一个可选的另个或更多字符的“标签”、另一个美元符号、一个构成字符串内容的任意字符序列、一个美元符号、开始这个美元引用的相同标签和一个美元符号组成。
+
+```
+$$Dianne's horse$$
+$SomeTag$Dianna's horse$SomeTag$
+```
+
+在一个美元引用字符串中不需要对字符进行转义：字符串内容总是按其字面意思写出。
+
+可以通过在每一个嵌套级别上选择不同的标签来嵌套美元引用字符串常量。这最常被用在编写函数定义上。
+
+```
+$function$
+BEGIN
+    RETURN ($1 ~ $q$[\t\r\n\v\\]$q$);
+END;
+$function$
+```
+
+标签是大小写敏感的，因此`$tag$String content$tag$`是正确的，但是`$TAG$String content$tag$`不正确。
+
+一个跟着一个关键词或标识符的美元引用字符串必须用空白与之分隔开，否则美元引用定界符可能会被作为前面标识符的一部分。    
+
+美元引用不是 SQL 标准的一部分，但是在书写复杂字符串文字方面，它常常是一种比兼容标准的单引号语法更方便的方法。
+
+**位串常量**
+B'1001'
+**数字常量**
+
+```
+digits
+digits.[digits][e[+-]digits]
+[digits].digits[e[+-]digits]
+digitse[+-]digits
+
+//合法数字常量示例
+42
+3.5
+4.
+.001
+5e2
+1.925e-3
+```
+
+如果使用了小数点，在小数点前面或后面必须至少有一个数字。如果存在一个指数标记（`e`），在其后必须跟着至少一个数字。
+
+如果一个不包含小数点和指数的数字常量的值适合类型`integer`（32 位），它首先被假定为类型`integer`。否则如果它的值适合类型`bigint`（64 位），它被假定为类型`bigint`。再否则它会被取做类型`numeric`。包含小数点和/或指数的常量总是首先被假定为类型`numeric`。    
+一个数字常量初始指派的数据类型只是类型转换算法的一个开始点。在大部分情况中，常量将被根据上下文自动被强制到最合适的类型。必要时，你可以通过造型它来强制一个数字值被解释为一种指定数据类型。例如，你可以这样强制一个数字值被当做类型`real`（`float4`）：
+
+```
+类型转换
+REAL '1.23' -- string style
+1.23::REAL -- pgsql historical style
+```
+
+```
+type 'string'  // or typename ( 'string' )  // type语法无法对数组类型工作，指定一个数组常量的类型可使用::或CAST()。 
+'string'::type
+CAST ( 'string' AS type )
+```
+
+## 操作符
+
+```
++ - * / < > = ~ ! @ # % ^ & | ` ?
+```
+
+特殊字符
+
+- 跟随在一个美元符号（`$`）后面的数字被用来表示在一个函数定义或一个预备语句中的位置参数。在其他上下文中该美元符号可以作为一个标识符或者一个美元引用字符串常量的一部分。     
+
+-  冒号（`:`）被用来从数组中选择“切片”
+- 方括号（`[]`）被用来选择一个数组中的元素。
+
+### 注释
+
+-- ，也可以使用 C 风格注释块：
+
+```
+/* multiline comment
+ * with nesting: /* nested block comment */
+ */
+```
+
+可以注释掉一大段可能包含注释块的代码。   
+
+### 操作符优先级
+
+大部分操作符具有相同的优先并且是左结合的。操作符的优先级和结合性被硬写在解析器中。
+
+当使用二元和一元操作符的组合时，有时你将需要增加圆括号。
+
+```
+SELECT 5 ! - 6;
+被解析成 select 5 ! (-6);
+```
+
+因为解析器不知道 — 知道时就为时已晚 — `!`被定义为一个后缀操作符而不是一个中缀操作符。在这种情况下要得到想要的行为，你必须写成：
+
+select (5!) - 6;
+
+
+
+## 值表达式
+
+### 位置参数
+
+```
+create function dept(text) return dept
+ as $$ select * from dept where name = $1 $$
+ language sql;
+ -- $1引用函数被调用时第一个函数参数的值。 
+```
+
+### 数组下标
+
+expression[subscript]
+expression[lower_subscript:upper_subscript] // 数组切片
+每一个*`下标`*自身是一个表达式，它必须得到一个整数值。   
+
+```
+mytable.arraycolumn[4]
+mytable.two_d_column[17][34]
+$1[10:42]
+(arrayfunction(a,b))[42]
+```
+
+### 域选择
+
+```
+expression.fieldname
+
+mytable.mycolumn
+$1.somecolumn
+(rowfunction(a,b)).col3
+(compositecol).*
+```
+
+### 函数调用
+
+```
+function_name ([expression [, expression ... ]] )
+sqrt(2) // 可能受限于一个模式名
+```
+
+### 聚集表达式
+
+```
+aggregate_name (expression [ , ... ] [ order_by_clause ] ) [ FILTER ( WHERE filter_clause ) ] 
+aggregate_name (DISTINCT expression [ , ... ] [ order_by_clause ] ) [ FILTER ( WHERE filter_clause ) ]
+aggregate_name ( * ) [ FILTER ( WHERE filter_clause ) ]
+aggregate_name ( [ expression [ , ... ] ] ) WITHIN GROUP ( order_by_clause ) [ FILTER ( WHERE filter_clause ) ]
+```
+
+大部分聚集函数忽略空输入，这样其中一个或多个表达式得到空值的行将被丢弃。除非另有说明，对于所有内建聚集都是这样。   
+例如，`count(*)`得到输入行的总数。`count(f1)`得到输入行中`f1`为非空的数量，因为`count`忽略空值。而`count(distinct f1)`得到`f1`的非空可区分值的数量。   
+
+一般地，交给聚集函数的输入行是未排序的。在很多情况中这没有关系，例如不管接收到什么样的输入，`min`总是产生相同的结果。但是，某些聚集函数（例如`array_agg` 和`string_agg`）依据输入行的排序产生结果。当使用这类聚集时，可选的*`order_by_clause`*可以被用来指定想要的顺序。
+
+*`order_by_clause`*与查询级别的`ORDER BY`子句具有相同的语法，除了它的表达式总是仅有表达式并且不能是输出列名称或编号。//数字只带输出列，排序。
+
+```
+SELECT array_agg(a ORDER BY b DESC) FROM table;
+SELECT string_agg(a, ',' ORDER BY a) FROM table;//多参数聚集函数
+```
+
+❓如果在*`order_by_clause`*之外指定了`DISTINCT`，那么所有的`ORDER BY`表达式必须匹配聚集的常规参数。也就是说，你不能在`DISTINCT`列表没有包括的表达式上排序。   
+
+⚠️  在一个聚集函数中指定`DISTINCT`以及`ORDER BY`的能力是一种PostgreSQL扩展。    
+
+
+
+有序集聚集的典型例子包括排名和百分位计算。
+
+如果指定了`FILTER`，那么只有对*`filter_clause`*计算为真的输入行会被交给该聚集函数，其他行会被丢弃
+
+```
+ create table test(id int, c1 int);  
+ insert into test select generate_series(1,10000), random()*10;  
+```
+
+
+
+```sql
+SELECT
+    count(*) AS unfiltered,
+    count(*) FILTER (WHERE i < 5) AS filtered
+FROM generate_series(1,10) AS s(i);
+```
+
+```sql
+SELECT percentile_cont(0.5) WITHIN GROUP (ORDER BY income) FROM households;
+```
+
+一个聚集表达式只能出现在`SELECT`命令的结果列表或是`HAVING`子句中。在其他子句（如`WHERE`）中禁止使用它，因为那些子句的计算在逻辑上是在聚集的结果被形成之前。   
+
+❓ within group
+
+## 窗口函数调用
+
+也叫做 窗口聚集函数
+
+```
+function_name ([expression [, expression ... ]]) [ FILTER ( WHERE filter_clause ) ] OVER window_name
+function_name ([expression [, expression ... ]]) [ FILTER ( WHERE filter_clause ) ] OVER ( window_definition )
+function_name ( * ) [ FILTER ( WHERE filter_clause ) ] OVER window_name
+function_name ( * ) [ FILTER ( WHERE filter_clause ) ] OVER ( window_definition )
+```
+
+其中*`window_definition`*的语法是
+
+```
+[ existing_window_name ]
+[ PARTITION BY expression [, ...] ]
+[ ORDER BY expression [ ASC | DESC | USING operator ] [ NULLS { FIRST | LAST } ] [, ...] ]
+[ frame_clause ]
+```
+
+可选的*`frame_clause`*是下列之一
+
+```
+{ RANGE | ROWS | GROUPS } frame_start [ frame_exclusion ]
+{ RANGE | ROWS | GROUPS } BETWEEN frame_start AND frame_end [ frame_exclusion ]
+```
+
+​    其中*`frame_start`*和*`frame_end`*可以是下面形式中的一种
+
+```
+UNBOUNDED PRECEDING
+offset PRECEDING
+CURRENT ROW
+offset FOLLOWING
+UNBOUNDED FOLLOWING
+```
+
+​    而*`frame_exclusion`*可以是下列之一
+
+```
+EXCLUDE CURRENT ROW
+EXCLUDE GROUP
+EXCLUDE TIES
+EXCLUDE NO OTHERS
+```
+
+ 这里，*`expression`*表示任何自身不含有窗口函数调用的值表达式。   
+
+一个*窗口函数调用*表示在一个查询选择的行的某个部分上应用一个聚集类的函数。
+
+ 窗口函数能够根据窗口函数调用的分组声明（`PARTITION BY`列表）访问属于当前行所在分组中的所有行。
+
+
+
+http://www.postgres.cn/docs/12/sql-expressions.html
+
+暂停
 

@@ -199,6 +199,8 @@ ou can now safely use `===` and `!==` to test for `undefined` without using `typ
 $('div:contains("test")').css('background-color', 'red');
 <div>This is a test</div>
 <div>Another Div</div>
+
+$('div:contains(当日)')
 ```
 
  
@@ -923,3 +925,18 @@ function onlyUnique(value, index, self) {
 // usage example:
 var a = ['a', 1, 'a', 2, '1'];
 var unique = a.filter( onlyUnique ); // returns ['a', 1, 2, '1'] 
+
+
+
+
+
+```js
+function getMonday(d) {
+  d = new Date(d);
+  var day = d.getDay(),
+      diff = d.getDate() - day + (day == 0 ? -6:1); // adjust when day is sunday
+  return new Date(d.setDate(diff));
+}
+
+getMonday(new Date()); // Mon Nov 08 2010
+```
