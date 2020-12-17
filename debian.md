@@ -1,30 +1,67 @@
-# 简介
+# Debian 管理员手册》
 
->www.debian.org
->
->https://debian-handbook.info/
->
->https://debian-handbook.info/browse/zh-CN/stable/  翻译中
+www.debian.org
 
-# 《debian-handbook.info》
+https://debian-handbook.info/
 
-**Linux 发行版本与 Linux 内核**
+https://debian-handbook.info/browse/zh-CN/stable/  翻译中
 
-​		严格意义上说，Linux 只是一个内核，是处于硬件与应用程序之间的核心软件。 
+# 安装
 
-​		Linux 发行版本则是一个完整的操作系统，通常包括 Linux 内核，安装程序，大部分重要的应用程序和其它能把电脑变得有用的软件。 
+**Debian Pure Blends** 为各个行业准备的发行版：游戏 化学工程师。。。
 
-适用于 GNU/Linux 的通用文档也适用于 Debian，因为 Debian 包括最常见的自由软件。不过，作为一个发行版， Debian 带来了许多改进，带有“Debian 风格”。
+CD = 精简（大概可以这样说？(*´д`)）的镜像
+DVD = 附带一大堆可选软件包的镜像
+Live CD 从光盘启动的镜像系统 
 
-#  第 1 章 Debian 项目
+[debian-10.7.0-amd64-DVD-1.iso.torrent](https://cdimage.debian.org/debian-cd/current/amd64/bt-dvd/debian-10.7.0-amd64-DVD-1.iso.torrent)
+[debian-10.7.0-amd64-DVD-2.iso.torrent](https://cdimage.debian.org/debian-cd/current/amd64/bt-dvd/debian-10.7.0-amd64-DVD-2.iso.torrent)
+[debian-10.7.0-amd64-DVD-3.iso.torrent](https://cdimage.debian.org/debian-cd/current/amd64/bt-dvd/debian-10.7.0-amd64-DVD-3.iso.torrent)
 
->`debian-cd` 已经存在很长时间了，它可以用来创建一组光盘，其中仅包含一系列预先选择的软件包；`debian-installer` 也是一个模块化的安装工具，易于适应不同的需求。`APT` 可以使用不同的来源安装软件包，同时保证系统整体的一致性。 		
->
->目前支持有 10 个硬件架构
->
->Debian 遵循所有的自由软件的原则，在充分准备好之前新版本不会释出。开发者不会被时间表限定需要追赶一个随意的截止日期。人们经常抱怨  Debian 发布稳定版之间的时间间隔过长，但这样的谨慎保证了 Debian  一贯的可靠性：在赋予全发行版“稳定”标签之前长时间的测试确实是必要的。 
+The three DVDs contain optional,  rarely used programs. If you want to install exotic programs on a  machine without Internet connection, you'll need all three.
 
-## 如何迁移
+If you want to install debian right now, don't bother, the first DVD is more than enough. 
+
+
+
+## 分区
+
+第一种方法是 “都在一个分区”。整个 Linux 系统都存在于单个文件系统下，即根 `/` 文件夹。这个对于个人或单用户系统来说简单也实用。实际上，会建两个分区；第一个是整个系统，第二个是虚拟内存(交换分区)。 			
+第二种： /  , /home
+第三种： /home`, `/usr`, `/var`,  `/tmp ，适合于服务器和多用户系统
+ 除了根 (`/`) 和用户 (`/home/`) 分区，还有 应用软件 (`/usr/`)，服务器软件数据 (`/var/`, 和临时文件 (`/tmp/`)。这样分区有几个优势。用户不会因为使用完所有可用硬盘空间而锁定整个服务器 (他们只能用完`/tmp/` 和 `/home/`)。守护进程的数据(尤其是日志)不会再填满系统的其余部分。 			
+
+### 配置包管理 (`apt`)
+
+为了能够安装附加软件， APT 需要配置以便知道到何处寻找 Debian 软件包。这一步是尽可能自动化的。开始会提问是否必须使用软件包的网络源，或者仅仅在 CD-ROM 里寻找所需软件。 		
+
+引导程序是 BIOS 开始的第一个程序。它把 Linux 内核加载进内存然后执行。通常提供给用户一个内核选择菜单去加载引导操作系统。 
+
+在 Debian 安装过程中检测到已经安装的操作系统时，会自动把它加到引导菜单项中，
+				默认情况下，GRUB 显示菜单包括了所有已检测到操作系统的 Linux 内核。这就是为什么你要接受安装它到主引导扇区的原因。保存旧的内核的好处在于，当你的新内核不能在硬件上工作良好时，还能用旧内核正常引导系统，所以最好保存最近三个版本的内核。 		
+
+GRUB 是 Debian 的默认引导程序：它能识别大部分的文件系统，因此在每次安装新内核之后无须作更新，这是由于引导时 GRUB 是通过读取配置文件找到新内核的实际位置的。
+
+GRUB 更像是一组始于不同情况的多个引导加载程序。GRUB源软件包之外建立多个二进制软件包反映出：grub-efi-amd64是64位PC以UEFI模式启动，grub-efi-ia32是32位PC以UEFI模式启动，grub-pc是以BIOS模式启动PC*grub-uboot*用于ARM计算机等。
+
+**安全启动**（Secure  Boot）是一种保证只有操作系统发行者确认合法的软件才允许运行的技术。为了实现这个工作，启动顺序的每个单元都确认将要运行的下个软件部分合法。在最深的层次上，UEFI固件嵌入了微软提供的密钥，来检查引导加载程序的签名，确保安全执行。由于获得微软签署的二级制文件是个漫长的过程，Debian决定不直接签署GRUB。取而代之的是使用被称为shim的中间引导加载程序，它几乎从不需要改变，其角色是检查Grub上Debian提供的签名，并执行GRUB。为了在允许安全启动的机器上运行Debian，需要安装shim-signed软件包。 		
+
+Debian10是支持安全启动（Secure Boot）的第一个发行版。此前，必须禁止BIOS或UEFI提供的系统设置屏幕上的安全特性。 		
+
+**首次启动后**
+
+如果你选择”图形桌面环境“，系统将显示 `gdm3` 登录管理器。 	
+安装软件。`apt`(从命令行执行) 和 `synaptic` (**系统** → **管理** → **Synaptic 包管理**) 。 		
+
+为了所安装的程序的一致性， Debian 创造了专用于特定用途的 “任务” (邮件服务器，文件服务器，等等)。在安装过程中你已经有机会选择它们了，感谢包管理工具你能够以后再次访问它们，比如 `aptitude` (在不同的部分列出的任务) 和 `synaptic` (通过目录 **编辑** → **任务标记软件包…**) 。 		
+
+Aptitude 是 APT 全屏字符模式的接口。它允许用户以各种方式浏览可用软件包列表
+
+
+
+
+
+
 
 ### nmap
 
@@ -50,23 +87,7 @@
 
 debsums 软件包允许将由软件包安装的每个文件的 MD5 哈希和与参考哈希和进行比较，并帮助确定，那些文件被改变，
 
-## 安装
 
-Buster 的安装程序基于 `debian-installer`。
-
-引导程序是 BIOS 开始的第一个程序。它把 Linux 内核加载进内存然后执行。通常提供给用户一个内核选择菜单去加载引导操作系统。 		
-
-双系统，在 Debian 安装过程中检测到已经安装的操作系统时，会自动把它加到引导菜单项中，但不是所有的安装程序都能这么做。 		
-
-GRUB 是 Debian 的默认引导程序：它能识别大部分的文件系统，因此在每次安装新内核之后无须作更新，这是由于引导时 GRUB 是通过读取配置文件找到新内核的实际位置的
-
-安全启动（Secure Boot）是一种保证只有操作系统发行者确认合法的软件才允许运行的技术。对启动时的每个软件都进行密钥检验，过长太漫长。Debian决定不直接签署GRUB，使用shim中间引导加载程序，检查Grub上Debian提供的签名，并执行GRUB。为了在允许安全启动的机器上运行Debian，需要安装shim-signed软件包。 		
-
-Debian10是支持安全启动（Secure Boot）的第一个发行版。此前，必须禁止BIOS或UEFI提供的系统设置屏幕上的安全特性。
-
-安装现已完成，提示你取出光盘并重启计算机
-
-如果你选择”图形桌面环境“，系统将显示 `gdm3` 登录管理器
 
 # 包管理系统
 

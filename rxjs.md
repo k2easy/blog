@@ -1,6 +1,6 @@
 # 资源
 
-印记中文 中文教程https://cn.rx.js.org/ 版本5，太旧
+印记中文 中文教程https://cn.rx.js.org/
 
 https://rxjs.dev/guide/overview
 
@@ -19,3 +19,12 @@ Observable 包含：Observer,Schedulers,Subjects,operators(Array#extras(map,filt
 Obervable: an invokable collection of future values or events. //包含 未来数值、未来事件 的可调用集合
 
 Observer：  
+
+# 安装
+
+```
+npm install rxjs
+import Rx from 'rxjs/Rx';
+Rx.Observable.of(1,2,3)
+```
+

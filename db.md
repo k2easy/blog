@@ -300,3 +300,165 @@ WHERE (
       ) 
 ```
 
+
+
+
+
+
+
+# [在Linux下设置Kettle的定时任务](https://www.cnblogs.com/yuezc/p/12101089.html)
+
+实现报表的中间表
+
+
+
+
+
+Control-M是一个跨平台的批量[作业调度](https://baike.baidu.com/item/作业调度/7205052)管理软件，采用C/S模式，在服务器上安装Enterprise Manager和服务器，在被控[主机](https://baike.baidu.com/item/主机)上安装agent, agent可以在主机上提交由Control-M定义好的[作业流](https://baike.baidu.com/item/作业流)，并返回运行结果。在 Enterprise Manager上面则可以全面监视所有批量作业的运行情况，可以有多种方式控制job的运行条件和过程干预。
+支持 ORACLE，SQL Server和Postgresql。
+
+
+
+# 日期
+
+select (current_date - 1 DAY) as yesterday 
+
+select varchar_format(current timestamp,'YYYY-MM-DD')
+
+select (date '2020-12-10' - 30 DAYS) as sdate  ; 字符串转日期
+
+
+
+​	两个日期相隔几天
+
+```sql
+SELECT DAYS(CURRENT_DATE) - DAYS(convertedDate)
+FROM Converted
+```
+
+N union all 空集合
+
+
+
+
+
+1、创建索引
+
+create index 索引名 on 表名（列名，列名）；
+
+2、删除索引
+
+drop index 索引名 on 表名；
+
+3、查看表索引
+
+select * from sysibm.sysindexes where tbname = '表名'；--表名要区分大小写
+
+或者数据库后台可以用
+
+describe indexes for table 表名;
+
+4、查看SQL语句执行计划
+
+  db2expln -d 库名 -f test.sql -t -g -z ";" > test.exp
+
+5、查看SQL语句索引优化建议
+
+  db2advis -d 库名 -i test.sql
+
+
+
+concat
+
+SELECT 'IBM' *||* ' ' *||* '*DB2*' FROM SYSIBM.SYSDUMMY1
+
+
+
+
+
+# sqlserver 自定义函数
+
+标量值函数
+
+```sql
+CREATE FUNCTION Foo(@ret int )  --传入了一个int类型的参数
+RETURNS int       --注意这里返回的是一个数据类型
+AS  
+BEGIN 
+    declare @n int
+    set @n = 3
+    return @n* @ret
+END
+```
+
+内嵌表值函数
+
+```
+create function GetUser(@name varchar(10))
+returns table
+as
+return select * from userInfo where userName=@name
+```
+
+```
+select * from getuser('admin')
+```
+
+多语句表值函数
+
+```sql
+ --多句表格值函数
+   create function 函数名（参数）
+   returns 表格变量名table (表格变量定义)
+   [with {Encryption | Schemabinding }]
+as
+   begin
+    SQL语句
+   end
+--多句表格值函数包含多条SQL语句，至少有一条在表格变量中填上数据值
+```
+
+```sql
+create function GetInfo(@name varchar(20))
+returns @cTable table(UserName varchar(10),UserPwd varchar(10))
+as
+begin
+　　insert into @cTable
+　　select userName,userPass from userinfo where username=@name
+return   --函数中最后一条语句必须是返回语句。
+end
+--调用
+select * from GetInfo('admin')
+------------
+UserName UserPwd
+admin     amin
+```
+
+
+
+从1到10的求和
+
+```
+select dbo.sumUp(10)
+
+------
+55
+```
+
+```sql
+create function sumUp(@number int)
+returns int
+as 
+begin
+    declare @sum int,@i int;
+    set @sum = 0;
+    set @i = 0;
+    while @i <= @number
+    begin
+         set @sum=@sum+@i
+         set @i=@i+1
+     end
+    return @sum
+end	
+```
+

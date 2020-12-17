@@ -125,6 +125,9 @@ C. 将参数绑定在单元格上（无法移除参数）
 
 
 
+
+
+
 	 电子表格拖拽字段到表格上后，字段的左父格和上父格都默认为“ 有
 	
 	 电子表格中为了让标题行在分页之后的每一页都还可以继续显示，C. 设置打印标题
@@ -3751,23 +3754,23 @@ function main(spreadsheetReport) {
 
 
 ​        
-        var gridData = chartView.getGridData();
-        var data = gridData.data;
-        
-        var maxIndex=0,minIndex=0;
-        data.forEach(function(arr,i){
-            let name = arr[0].value;
-            let value = arr[1].value;
-            if(value>data[maxIndex][1].value){
-                maxIndex = i ;
-            }
-            if(value<data[minIndex][1].value){
-                minIndex=i;
-            }
-        }) 
-        
-       var optionData= option.series[0].data;
-    
+​        var gridData = chartView.getGridData();
+​        var data = gridData.data;
+​        
+​        var maxIndex=0,minIndex=0;
+​        data.forEach(function(arr,i){
+​            let name = arr[0].value;
+​            let value = arr[1].value;
+​            if(value>data[maxIndex][1].value){
+​                maxIndex = i ;
+​            }
+​            if(value<data[minIndex][1].value){
+​                minIndex=i;
+​            }
+​        }) 
+​        
+​       var optionData= option.series[0].data;
+​    
        if(optionData){  
               optionData[maxIndex].itemStyle={
                   normal:{
@@ -3891,4 +3894,41 @@ echarts地图边框阴影
 传值到某一个区域，如某个单元格。
 
 ![img](https://wiki.smartbi.com.cn/download/attachments/49812988/image2020-2-21 16%3A37%3A16.png?version=1&modificationDate=1582274237000&api=v2)
+
+
+
+# [原生SQL SQL查询区别](https://wiki.smartbi.com.cn/pages/viewpage.action?pageId=27001170)
+
+**SQL查询** 
+
+- 原理：对用户撰写的SQL进行一层包装，添加更多分析功能。
+  例如客户写的是select t.x as Fa, (t.x+t.y) as Fb from T where ....
+  那么封装后就变成：    
+  select Fa, Fb //可以选择显示那些字段。
+  from       
+  (select t.x as Fa, (t.x+t.y) as Fb from T where .... ) TX       
+  where .... //报表展现中，可以设置过滤条件，就是靠修改的这部分SQL实现       
+  order by ....//报表展现中，排序操作，就是靠修改的这部分SQL实现       
+  group by ... //报表展现中，聚合小计操作，就是靠修改的这部分SQL实现      
+
+- 优势：在灵活分析的展现界面，还可以做排序，过滤，汇总等操作；     
+- 劣势：对SQL有书写要求，需要在用户sql中，显式申明别名；对SQL做多一层封装，对于某些数据库来说，可能效率会低一些；
+
+**原生SQL查询** 
+
+- 原理：不对用户的SQL做任何封装，直接提交到数据库。 
+- 优势：对SQL语法没有任何限制；速度更快； 
+- 劣势：不计算总行数；如果查询结果较大，用户可能不知道结果集大小；在灵活分析的展现界面，不支持排序、过滤、聚合等操作；
+
+
+
+
+
+此现象一般时因为电子表格中建跳转规则的单元格刚好被excel里的形状或者图片遮挡了，因为单元格中的文字时在最底部，而形状在文字的上方，所以就无法点击。只需要将遮挡的形状移开即可解决。
+
+在电子表格设计器中创建电子表格，其中图形位于Sheet1，并且图形名称为“销售柱图”
+
+在电子表格跳转源报表中，可以进行跳转并将源报表中的参数值传递给目标报表。
+
+可以右键图片属性面板数值调整大小 取消宽高比。
 
