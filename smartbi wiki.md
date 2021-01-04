@@ -128,6 +128,7 @@ C. 将参数绑定在单元格上（无法移除参数）
 
 
 
+
 	 电子表格拖拽字段到表格上后，字段的左父格和上父格都默认为“ 有
 	
 	 电子表格中为了让标题行在分页之后的每一页都还可以继续显示，C. 设置打印标题
@@ -3771,21 +3772,21 @@ function main(spreadsheetReport) {
 ​        
 ​       var optionData= option.series[0].data;
 ​    
-       if(optionData){  
-              optionData[maxIndex].itemStyle={
-                  normal:{
-                      borderWidth:5,
-                      borderColor:'green'
-                  }
-              }
-            optionData[minIndex].itemStyle={
-                  normal:{
-                      borderWidth:5,
-                      borderColor:'green'
-                  }
-              } 
-       }
-       
+​       if(optionData){  
+​              optionData[maxIndex].itemStyle={
+​                  normal:{
+​                      borderWidth:5,
+​                      borderColor:'green'
+​                  }
+​              }
+​            optionData[minIndex].itemStyle={
+​                  normal:{
+​                      borderWidth:5,
+​                      borderColor:'green'
+​                  }
+​              } 
+​       }
+​       
        setTimeout(function(){
             var eChart = biChart.getChart();
             eChart.setOption(option)
@@ -3932,3 +3933,78 @@ echarts地图边框阴影
 
 可以右键图片属性面板数值调整大小 取消宽高比。
 
+
+
+
+
+
+
+首先，要明确，我们的数据集中最外层必须有select 语句，要有返回结果集。
+
+其次，在数据集中是可以执行多条语句的，多条语句间用分号间隔开即可。
+
+在数据集中执行存储过程，可以参考下面这种：
+
+第一条是select语句，是这个数据集本身需要返回的数据。
+
+第二条是执行的存储过程，需要注意的是，我们仅仅只是在数据集中执行这个存储过程而已，不会获得这个存储过程执行返回的结果。![img](https://cdn.jsdelivr.net/gh/k2easy/picgo/2020/12/1820201218095640.png)
+
+
+
+# 宏 执行sql查询
+
+```
+function main(spreadsheetReport) {
+
+    //每次点击保存进行一次校验
+
+    var writeBack = spreadsheetReport.spreadsheetReportWriteBack;
+    writeBack.removeListener(writeBack.elem_btnSave, "click", writeBack.doSaveClick, writeBack);
+    
+    //console.log($(writeBack.elem_btnSave).off('click'))
+    
+    var elemEventHandler = function(e) { 
+            var b3 = spreadsheetReport.getCell("B3").innerText;
+
+            var isExist = ifExistName(b3);
+            console.log(isExist)
+            if (isExist) {
+                layer.msg('数据已经存在', {
+                    icon: 2
+                })
+                return;
+            }else{
+                 this.doSaveClick(e);
+            }
+
+           
+        };
+            writeBack.elem_btnSave.removeEventListener("click", elemEventHandler , true);
+    writeBack.addListener(writeBack.elem_btnSave, "click", elemEventHandler,   writeBack);
+  
+ 
+
+}
+
+function ifExistName(name) {
+    //宏代码中如何执行SQL语句
+    var util = jsloader.resolve("freequery.common.util");
+    var ret = util.remoteInvoke("DataSourceService", "executeNoCacheable", ["DS.test", "select distinct name  from test.tzbank1 where name is not null and length(name)>0 "]);
+    if (ret.succeeded && ret.result) {
+        var data = ret.result.data;
+        for (var i = 0; i < data.length; i++) {
+            // console.log(data[i][0].stringValue,name)
+            if (data[i][0].stringValue == name) { 
+                return true
+            }
+        }
+    }
+    return false
+}
+```
+
+
+
+
+
+![img](https://wiki.smartbi.com.cn/download/attachments/47481469/image2019-10-29 17%3A43%3A31.png?version=1&modificationDate=1572342215000&api=v2)

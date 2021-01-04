@@ -494,4 +494,125 @@ smartbi echarts 支持的图形的种类少，缺少对应的demo数据格式示
 
 可以把常用的sql代码段做成函数调用，避免创建sql函数或数据集的麻烦。
 
+smartbi sql数据集支持横杠注释，这样从数据库客户端复制到，可以直接使用。
+
+产品安装时不支持pg作为系统数据库
+
+
+
+点击表头可以选中整列 进行复制整列数据
+
+
+
+有时候参数复制出错，sql数据集中的ui参数不够直观，应该用字符包裹 染色。
+
+数据集编辑器 会退功能不好用 ，保存之后就无法会退 ，
+
+
+
+SUMPRODUCT
+
+在给定的多个数组中，将数组间的对应元素相乘，返回乘积之和。
+
+![SUMPRODUCT 函数](https://cdn.jsdelivr.net/gh/k2easy/picgo/2020/12/2820201228104733.png)
+
+
+
+web数据集编辑器有弱，无法选中片段执行，如内嵌sql查看结果
+
+不，可以分段写sql，一长段太麻烦，每段有10行数据预览，解释器进行合并。
+
+可以添加备注 图片，以便过长过麻烦的sql逻辑
+
+
+
+  在总计单元格中sumproduct调用了小计单元格中的sumproduct内容，计算结果不正确。 
+可以用 =sumproduct((D4), (F4))/ D5 添加括号进行解决。
+
+## 
+
+插入图片自适应是按照图片宽度自适应的，图片的边界线在单元格中间，导致加载整个单元格会超出图片边界，多出来的一半单元格显示空白
+
+## 解决方案
+
+调整网格线与插入图片边界线重合，
+
+![img](https://cdn.jsdelivr.net/gh/k2easy/picgo/2020/12/2920201229094946.jpg)
+
+
+
+
+
+
+
+插入图片，修改图片大小为原始尺寸
+
+
+
+excel函数追加字符串 &"abc"
+
+excel 颜色单元格可以直接输入#999 颜色，不用选
+
+格式刷 可以刷 表格渐变色 规则 
+
+
+
+# 隐藏空白行
+
+![img](https://cdn.jsdelivr.net/gh/k2easy/picgo/2020/12/2920201229152942)
+
+```
+function main(spreadsheetReport) {
+    //获取D5单元格中的值做判断,隐藏行
+    var posList = spreadsheetReport.sheets[0].getExpandedPositions("D5");
+    var cells = spreadsheetReport.workbook.worksheets.get(0).cells;
+    for (var i = 0; i < posList.length; i++) {
+        var pos = posList[i]
+       var value = cells.get(pos.row, pos.column).getStringValue().trim();
+        if (value == null || value.trim().length <= 0) {
+            cells.hideRow(pos.row) //方法删除行
+        }
+    }
+}
+```
+
+方向键 移动背景图片 一直移动到最左侧
+
+
+
+# 自定义按钮点击事件
+
+日期切换按钮 当月
+
+```
+ function main(spreadsheetReport, isAjaxRefreshCallback) {
+             var dyBtn = spreadsheetReport.elemSheetFrame.contentDocument.querySelector('img[name="当月_日期切换按钮"]');
+             $(dyBtn).parent().on("click",function(){
+             
+             })
+       }
+       
+```
+
+smartbi  双Y图不支持 并列轴
+
+
+
+# 取消隐藏
+
+
+
+1. Press Ctrl + Shift + 9 (the fastest way).
+
+2. Select Unhide from the right-click menu (the easiest way that does not require remembering anything).
+
+3. On the Home tab, click Format > Unhide **Rows** (the traditional way).
+
+   隐藏了后续所有行后，c t r l+shift+9 然后从最后一行序号出拖出来。
+
+
+
+smartbi 打开文件，最近使用的文件 列表
+
+
 

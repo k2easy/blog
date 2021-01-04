@@ -20,6 +20,19 @@ Kettle的ETL  处理流程与目标输出耦合性强，新的数据要求往往
 
 
 
+
+
+# ETL工具比较
+
+Kettle
+ Pentaho 旗下的 ETL 工具，有商业版本和开源版本两种，开源的由 sourceforge 维护
+
+In Pentaho you’ll define your jobs on a canvas and configure settings  through UI panes. In Airflow everything is defined within Python modules
+
+Apache NiFi is a dataflow management platform. 
+
+
+
 ![img](https://cdn.jsdelivr.net/gh/k2easy/picgo/2020/11/1820201118201106.jpg)
 
 ![img](https://cdn.jsdelivr.net/gh/k2easy/picgo/2020/11/1820201118201131.jpg)

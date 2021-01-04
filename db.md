@@ -462,3 +462,244 @@ begin
 end	
 ```
 
+
+
+右键创建函数 ，编写自定义函数代码 
+
+
+
+db2
+
+```
+cast(0.123 as varchar(20)) -- .123 ，0被丢失，
+varchar_format(0.123,'000.00000')
+
+```
+
+
+
+每个分组第一个
+
+```sql
+WITH summary AS (
+    SELECT p.id, 
+           p.customer, 
+           p.total, 
+           ROW_NUMBER() OVER(PARTITION BY p.customer 
+                                 ORDER BY p.total DESC) AS rk
+      FROM PURCHASES p)
+SELECT s.*
+  FROM summary s
+ WHERE s.rk = 1
+```
+
+
+
+# 存储过程
+
+mysql_local_k2easy  3306 root
+
+oracle 
+
+存储过程编译一次后就会存到数据库，每次调用直接执行。而普通sql语句需要先分析编译才能执行。
+
+## 无参数
+
+create or replace procedure demo AS/IS 
+
+​    @name varchar 
+
+​	@total number
+
+​	@sdate date -- integer
+
+BEGIN
+
+​      执行逻辑语句
+
+​	  EXCEPTION  -- 异常，可省略，方便调试
+
+END
+
+## 带参数
+
+create procedure demo(param1 student.id%TYPE ,@age number) AS 
+
+​	 total number :=0            -- 初始值
+
+begin
+
+​	select count(1) ,SUM(sex)into total,manNum from student s where s.age = @age
+
+   dbms_output.put_line('符合该年龄的学生有'||total'人')
+
+   EXCEPTION 
+
+​		when too_many_rows then 
+
+​		dbms_output.put_line('返回值多于1行')
+
+END
+
+
+IN默认可省略    OUT  INOUT 
+
+param1是student表id字段的类型
+
+into 查询结果赋值给一个或多个变量
+
+## 游标
+
+oracle会创建一个存储区域，成为上下文区域，用于处理sql语句，游标指向这个上下文区域，通过控制光标在上下文区域移动，游标持有的那一行数据返回。
+
+游标属性：
+
+%FOUND 查询到了结果返回true
+
+ %NOTFOUND  没查到数据
+%isopen
+%ROWCOUNT 
+
+定义游标 CURSOR cur_cdd is select s_id,s_name FROM student;
+
+open cur_cdd;
+
+FETCH cur_cdd INTO @id,@name;    -- 默认抓取一条
+
+close cu r_cdd 关闭游标，释放分配的内存
+
+存储过程一行一行执行时 如果遇到PL/SQL 语句就拿给PL/SQL 引擎执行，遇到SQL语句就送到sql引擎执行 执行结果返回给pl/sql引擎，千万数据记录更新，执行焦点频换替换，效率低。
+
+1、fetch into 多行集合数据给一个集合变量
+
+
+
+PL/SQL procedure language/sql
+
+
+
+取一行数据
+
+```sql
+declare 
+  v_emp EMP%ROWTYPE; -- 记录型变量只能存一行数据
+begin 
+  select * into v_emp from emp where  emp_no=1
+end
+```
+
+ 
+
+# 流程控制
+
+```sql
+begin 
+  if 条件1 then 执行1
+  	elseif 条件2 then 
+```
+
+
+
+
+
+WITH RETURN
+
+Specifies that the result table of the cursor is intended to be used as a result set that will be returned from a procedure
+
+TO CALLER
+
+Specifies that the cursor can return a result set to the caller of the procedure.
+
+
+
+
+
+数据集有参数情况下，抽取之后基于该数据集创建的资源不会走mpp。
+
+数据集没有参数的情况下，数据集抽取之后基于此创建的资源会走mpp，然后抽取之后的数据集预览的时候是实时查询不走mpp。
+
+
+
+ 
+
+1、数据抽取功能必须在当前数据集已保存的前提下才能被激活使用。
+
+2、系统支持“可视化数据集”、“即席查询”和“自助数据集”通过数据行权限控制数据抽取的结果。
+
+3、数据集抽取时，如果包含参数，则只会抽取参数默认值相关的数据，如果参数没有默认值，将无法正常完成抽取。
+
+
+
+数据抽取是指从源数据库中抽取原始数据到高速缓存库，它可以保证秒级获取大级别量的数据结果，提高系统性能。
+
+- 再次查询当前数据集或分析的数据时，从高速缓存库获取数据。
+
+- 数据集有参数情况下，抽取之后基于该数据集创建的资源不会走mpp。
+
+  数据集没有参数的情况下，数据集抽取之后基于此创建的资源会走mpp，然后抽取之后的数据集预览的时候是实时查询不走mpp
+
+
+
+高速缓存库 把 sql数据集的查询结果抽取到smartbi数据库中，下次查询变快。
+
+
+
+不设置抽取表名：默认以“数据集ID”作为表名称，“数据集名称”作为表别名
+
+
+
+
+
+loop  produre
+
+https://stackoverflow.com/questions/55643831/how-to-insert-cursor-resultset-that-produced-by-stored-procedure-to-temporary-ta
+
+```sql
+--#SET TERMINATOR @
+CREATE OR REPLACE PROCEDURE ITRS.SP_CALLER()
+DYNAMIC RESULT SETS 1
+
+BEGIN
+
+DECLARE loc_cursor RESULT_SET_LOCATOR VARYING;
+DECLARE SQLSTATE CHAR(5) DEFAULT '00000';
+DECLARE v_useraccountid SMALLINT;
+DECLARE v_roleid SMALLINT;
+DECLARE v_userid VARCHAR(20);
+DECLARE v_username VARCHAR(50);
+DECLARE v_lastlogindate TIMESTAMP;
+DECLARE v_deleted SMALLINT;
+
+DECLARE ret CURSOR WITH RETURN FOR
+SELECT * FROM ITRS.DUMBTABLE where USERID='JOHNDOE';
+
+
+CALL ITRS.PR_USERACCOUNTGETALL();
+
+ASSOCIATE RESULT SET LOCATOR (loc_cursor) WITH PROCEDURE ITRS.PR_USERACCOUNTGETALL;
+ALLOCATE cur CURSOR FOR RESULT SET loc_cursor;
+
+ins_loop: 
+LOOP
+  FETCH cur INTO v_useraccountid,v_roleid,v_userid,v_username,v_lastlogindate,v_deleted;
+  IF SQLSTATE <> '00000' THEN LEAVE ins_loop; END IF;
+  INSERT INTO ITRS.DUMBTABLE(USERACCOUNTID,ROLEID,USERID,USERNAME,LASTLOGINDATE,DELETED)
+  VALUES(v_useraccountid,v_roleid,v_userid,v_username,v_lastlogindate,v_deleted);
+  COMMIT;
+END LOOP ins_loop;
+CLOSE cur;
+open ret;
+END@
+```
+
+```sql
+DECLARE GLOBAL TEMPORARY TABLE SESSION.temp_table(
+USERACCOUNTID SMALLINT,
+ROLEID SMALLINT,
+USERID VARCHAR(20),
+USERNAME VARCHAR(50),
+LASTLOGINDATE TIMESTAMP,
+DELETED SMALLINT
+) WITH REPLACE NOT LOGGED;
+```
+

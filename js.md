@@ -940,3 +940,38 @@ function getMonday(d) {
 
 getMonday(new Date()); // Mon Nov 08 2010
 ```
+
+
+
+# createElement
+
+```
+var style = document.createElement('style');
+style.type = 'text/css';
+style.innerHTML = '.cssClass { color: #F00; }';
+document.getElementsByTagName('head')[0].appendChild(style);
+
+document.getElementById('someElementId').className = 'cssClass';
+
+
+			setTimeout(function(){
+				addChromeDownLink();
+			},0)
+			function addChromeDownLink(){
+			  var  lgForm = document.getElementsByClassName('login-content')[0];
+			  console.log(lgForm)
+			  var wrapTag = document.createElement('div');
+			  wrapTag.classList=['login-block'];
+			  wrapTag.style.marginTop='7px';
+			  wrapTag.style.textAlign='center';
+
+			  var aTag = document.createElement('a')
+			  var downLink = window.top.location.origin+'/chrome/chrome64.exe';
+			  aTag.setAttribute('href',downLink)
+			  aTag.innerText='Chrome下载链接';
+			  wrapTag.appendChild(aTag);
+			  
+			  lgForm.appendChild(wrapTag);
+			}
+```
+
