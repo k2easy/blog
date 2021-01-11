@@ -1486,3 +1486,20 @@ http://www.postgres.cn/docs/12/sql-expressions.html
 
 暂停
 
+```sql
+select d::date as start_date,(d + '1 month'::interval - '1 day'::interval )::date end_date
+from generate_series('2014-01-01'::date, '2014-06-30'::date, '1 month'::interval) d
+```
+
+```sql
+select CURRENT_DATE + i 
+from generate_series(date '2012-06-29'- CURRENT_DATE, 
+     date '2012-07-03' - CURRENT_DATE ) i
+```
+
+or even shorter:
+
+```sql
+select i::date from generate_series('2012-06-29', 
+  '2012-07-03', '1 day'::interval) i
+```

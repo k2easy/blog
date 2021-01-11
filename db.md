@@ -703,3 +703,69 @@ DELETED SMALLINT
 ) WITH REPLACE NOT LOGGED;
 ```
 
+
+
+集群部署 
+
+https://wiki.smartbi.com.cn/pages/viewpage.action?pageId=56689786
+
+
+
+```sql
+SELECT BrandId
+       ,SUM(ICount)
+       ,TotalICount = SUM(ICount) OVER ()    
+       ,Percentage = SUM(ICount) OVER ()*1.0 / SUM(ICount) 
+FROM Table 
+WHERE DateId  = 20130618
+GROUP BY BrandID
+```
+
+
+
+```
+with dummy(sdate) as (
+  select date('2020-10-31') as sdate from sysibm.sysdummy1  
+  union all select sdate +1 Days from dummy where sdate<='2020-12-31'
+) 
+select * from 
+dummy t0,
+(select * from (values('类型1'),('类型2'),('类型3')) as t_type(type)) t1 
+order by sdate 
+/*DB2 v10.5.0.6 */
+```
+
+
+
+# DB2获取月份第一天最后一天
+
+```sql
+SELECT TO_CHAR(LAST_DAY(SYSDATE), 'yyyy-mm-dd') FROM DUAL;  --本月最后一天
+
+
+
+SELECT TO_CHAR(LAST_DAY(ADD_MONTHS(SYSDATE, -1)), 'yyyy-mm-dd') FROM dual;   --上月最后一天
+
+
+
+SELECT TO_CHAR(LAST_DAY(ADD_MONTHS(SYSDATE, -1)), 'yyyy-mm')||'-01' FROM dual;   --上月第一天
+```
+
+--推荐下面的方法
+
+```sql
+SELECT TRUNC(CURRENT DATE,'MM') FROM DUAL;   --本月最后一天
+
+
+
+SELECT TRUNC(CURRENT DATE-1 MONTHS,'MM') FROM DUAL;    --上月最后一天
+
+
+
+SELECT  (TRUNC(CURRENT DATE,'MM') - 1 days) FROM DUAL;     --上月第一天
+```
+
+
+
+
+
