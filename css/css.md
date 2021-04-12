@@ -1,3 +1,270 @@
+#  less
+
+### It's CSS, with just a little more.
+
+Less (which stands for Leaner Style Sheets) is a backwards-compatible language extension for CSS. 
+
+```less
+//Variables
+@width: 10px;
+@height: @width + 10px;
+
+#header {
+  width: @width;
+  height: @height;
+}
+
+//Mixins
+.bordered {
+  border-top: dotted 1px black;
+  border-bottom: solid 2px black;
+}
+#menu a {
+  color: #111;
+  .bordered();
+}
+
+.post a {
+  color: red;
+  .bordered();
+}
+
+//Nesting
+#header {
+  color: black;
+  .navigation {
+    font-size: 12px;
+  }
+  .logo {
+    width: 300px;
+  }
+}
+
+.clearfix {
+  display: block;
+  zoom: 1;
+
+  &:after {
+    content: " ";
+    display: block;
+    font-size: 0;
+    height: 0;
+    clear: both;
+    visibility: hidden;
+  }
+}
+```
+
+## Operations
+
+`+`, `-`, `*`, `/` can operate on any number, color or variable.
+
+For CSS compatibility, `calc()` does not evaluate math expressions, but will evaluate variables and math in nested functions.
+
+```
+@var: 50vh/2;
+width: calc(50% + (@var - 20px));  // result is calc(50% + (25vh - 20px))
+```
+
+```
+@min768: (min-width: 768px);
+.element {
+  @media @min768 {
+    font-size: 1.2rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .element {
+    font-size: 1.2rem;
+  }
+}
+```
+
+## Functions
+
+```
+@base: #f04615;
+@width: 0.5;
+
+.class {
+  width: percentage(@width); // returns `50%`
+  color: saturate(@base, 5%);
+  background-color: spin(lighten(@base, 25%), 8);
+}
+```
+
+##  Namespaces and Accessors
+
+```
+#bundle() {
+  .button {
+    display: block;
+    border: 1px solid black;
+    background-color: grey;
+    &:hover {
+      background-color: white;
+    }
+  }
+  .tab { ... }
+  .citation { ... }
+}
+
+#header a {
+  color: orange;
+  #bundle.button();  // can also be written as #bundle > .button
+}
+```
+
+## Maps
+
+```
+#colors() {
+  primary: blue;
+  secondary: green;
+}
+
+.button {
+  color: #colors[primary];
+  border: 1px solid #colors[secondary];
+}
+```
+
+## Scope
+
+```
+@var: red;
+
+#page {
+  @var: white;
+  #header {
+    color: @var; // white
+  }
+}
+```
+
+## Comments
+
+```
+/* One heck of a block
+ * style comment! */
+@var: red;
+
+// Get in line!
+@var: white;
+```
+
+## Importing
+
+You can import a `.less` file, and all the variables in it will be available. The extension is optionally specified for `.less` files.
+
+```
+@import "library"; // library.less
+@import "typo.css";
+```
+
+# A Complete Guide to Grid
+
+CSS Grid Layout (aka “Grid”), is a two-dimensional grid-based layout system .
+Flexbox,is for simpler one-dimensional layouts.
+Flexbox and Grid actually work very well together.
+ Grid is the very first CSS module created specifically to solve the layout problems we’ve all been hacking our way around for as long as we’ve been making websites.
+
+参考资料： [*Get Ready for CSS Grid Layout*.](https://abookapart.com/products/get-ready-for-css-grid-layout)    [“A Complete Guide to Flexbox](https://css-tricks.com/snippets/css/a-guide-to-flexbox/)
+
+You’ll notice many similarities between his post and mine, because why not steal from the best?
+
+> Grid Track 两条行线 或两条列线之间的区域，可以看作是某行或某列
+
+#### Properties for the Grid container
+
+```
+display
+grid-template-columns
+grid-template-rows
+grid-template-areas
+grid-template:  A shorthand for setting grid-template-rows, grid-template-columns, and grid-template-areas in a single declaration.
+
+column-gap: <line-size>;
+row-gap: <line-size>
+gap: <grid-row-gap> <grid-column-gap>;
+justify-items
+align-items
+place-items: sets both the align-items and justify-items properties in a single declaration.
+```
+
+ 
+
+```css
+.container {
+  grid-template-columns: repeat(3, 20px [col-start]);
+}
+.container {
+  grid-template-columns: 1fr 1fr 1fr; //三等分
+}
+  grid-template-columns: 1fr 50px 1fr 1fr;
+```
+
+The `fr` unit allows you to set the size of a track as a fraction of the free space of the grid container. 
+//剩余空间fr等分
+
+```css
+.container {
+  display: grid;
+  grid-template-columns: 50px 50px 50px 50px;
+  grid-template-rows: auto;
+  grid-template-areas: 
+    "header header header header"
+    "main main . sidebar"
+    "footer footer footer footer";
+}
+```
+
+<img src="https://cdn.jsdelivr.net/gh/k2easy/picgo/2021/04/0120210401201554.svg" alt="Example of grid-template-areas" style="zoom: 25%;" />
+
+Since `grid-template` doesn’t reset the *implicit* grid properties (`grid-auto-columns`, `grid-auto-rows`, and `grid-auto-flow`), which is probably what you want to do in most cases, it’s recommended to use the `grid` property instead of `grid-template`.
+
+```
+.container {
+  grid-template-columns: 100px 50px 100px;
+  grid-template-rows: 80px auto 80px; 
+  gap: 15px 10px; //If no row-gap is specified, it’s set to the same value as column-gap
+}
+```
+
+**justify-items**
+子元素默认拉伸占满横向空间，内容占不满空间时可以靠左靠右居中排列。
+同理，竖向排列 align-items:stretch默认铺满，start end center
+
+```
+start – aligns items to be flush with the start edge of their cell
+end – aligns items to be flush with the end edge of their cell
+center – aligns items in the center of their cell
+stretch – fills the whole width of the cell (this is the default)
+```
+
+##### justify-content
+
+
+
+
+
+
+
+#### Propertis for Grid item
+
+```css
+.item {
+  grid-column-start: col-start 2;
+}	
+```
+
+ 
+
+
+
+
+
 
 
 # css 属性

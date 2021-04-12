@@ -186,7 +186,16 @@ UNION和UNION ALL是不同的。UNION消除重复行记录，UNION ALL不消除�
 
 
 
+```sql
+( SELECT KEY_FIELD_1,LOOKUP_FIELD_1  
+FROM TABLE_1  
+WHERE FILTER_FIELD = '1' )  
+EXCEPT  
+( SELECT KEY FIELD_2,LOOKUP_FIELD_2  
+FROM TABLE_2 )
+```
 
+he SQL EXCEPT operator takes the distinct rows of one query and returns the rows that do not appear in a second result set. The EXCEPT ALL operator does not remove duplicates. For purposes of row elimination and duplicate removal, the EXCEPT operator does not distinguish between NULLs
 
 
 
@@ -766,6 +775,211 @@ SELECT  (TRUNC(CURRENT DATE,'MM') - 1 days) FROM DUAL;     --上月第一天
 ```
 
 
+
+# inner join ,cross join 
+
+Cross join does not combine the rows, if you have 100 rows in each  table with 1 to 1 match, you get 10.000 results, Innerjoin will only  return 100 rows in the same situation.
+
+These 2 examples will return the same result:
+
+Cross join
+
+```sql
+select * from table1 cross join table2 where table1.id = table2.fk_id
+```
+
+Inner join
+
+```sql
+select * from table1 join table2 on table1.id = table2.fk_id
+```
+
+Use the last method
+
+
+
+
+
+Db2 Date Functions
+
+| **Function**      | Description                                                  |
+| ----------------- | ------------------------------------------------------------ |
+| **DAYOFWEEK_ISO** | Returns the day of the week from a value, where 1 is Monday and 7 is Sunday. |
+| DAYOFYEAR         | Returns the day of the year from a value.                    |
+| DAYS              | Returns an integer representation of a date.                 |
+| DAYS_BETWEEN      | Returns the number of full days between the specified arguments. |
+
+[另外 60 行](https://www.db2tutorial.com/db2-date-functions/)
+
+[
+Db2 Date Functions - Db2 Tutorial](https://www.db2tutorial.com/db2-date-functions/)
+
+DAYS_TO_END_OF_MONTH Returns the number of days to the end of the month.
+
+DAYS_BETWEEN  Returns the number of full days between the specified arguments.
+
+| WEEKS_BETWEEN | Returns the number of full weeks between the specified arguments. |
+| ------------- | ------------------------------------------------------------ |
+| YEAR          | Returns the year part of a value.                            |
+| YEARS_BETWEEN | Returns the number of full years between the specified arguments. |
+
+```
+   SET :NUMDAYS = DAYS(LAST_DAY(date '2013-02-20')) - DAYS(date '2013-02-20')
+   SET :NUMDAYS = DAYS_TO_END_OF_MONTH(DATE '2013-02-20')
+```
+
+
+
+db2声明全局变量 
+
+```
+ create or replace variable TEST.t_date VARCHAR(15) ;
+ set TEST.t_date='2021-02-28';
+ select TEST.t_date,name from t1 where tj_date = TEST.t_date;
+ drop variable TEST.t_date;
+```
+
+
+
+
+
+# 行转列
+
+```
+SELECT SEX, COUNT(*) as Number_Of_Managers
+  FROM EMP
+ WHERE JOB = ‘MANAGER’
+ GROUP BY SEX;
+ 
+ SELECT SUM(CASE WHEN SEX = ‘F’ THEN 1 ELSE 0 END) as Number_Of_Female_Managers,
+       SUM(CASE WHEN SEX = ‘M’ THEN 1 ELSE 0 END) as Number_Of_Male_Managers
+  FROM EMP;
+```
+
+```
+SELECT SUM(CASE WHEN EDLEVEL < 12 THEN 1 ELSE 0 END) AS EDLEVEL_LT12,
+       SUM(CASE WHEN EDLEVEL = 12 THEN 1 ELSE 0 END) AS EDLEVEL_12,
+       SUM(CASE WHEN EDLEVEL = 13 THEN 1 ELSE 0 END) AS EDLEVEL_13
+```
+
+```
+SELECT MAX(CASE WHEN JOB = 'ANALYST' THEN HIREDATE END)  AS ANALYST_MAX_HIREDATE,
+       MAX(CASE WHEN JOB = 'CLERK' THEN HIREDATE END)    AS CLERK_MAX_HIREDATE,
+  FROM EMP
+ WHERE JOB IN ('ANALYST', 'CLERK', 'DESIGNER', 'MANAGER');
+```
+
+```
+SELECT JOB,
+SUM(CASE WHEN WORKDEPT = 'A00' THEN 1 ELSE 0 END) AS A00,
+SUM(CASE WHEN WORKDEPT = 'B01' THEN 1 ELSE 0 END) AS B01,
+SUM(CASE WHEN WORKDEPT = 'C01' THEN 1 ELSE 0 END) AS C01,
+SUM(CASE WHEN WORKDEPT = 'D11' THEN 1 ELSE 0 END) AS D11,
+SUM(CASE WHEN WORKDEPT = 'D21' THEN 1 ELSE 0 END) AS D21,
+SUM(CASE WHEN WORKDEPT = 'E01' THEN 1 ELSE 0 END) AS E01,
+SUM(CASE WHEN WORKDEPT = 'E11' THEN 1 ELSE 0 END) AS E11,
+-- SUM(CASE WHEN WORKDEPT = 'E21' THEN 1 ELSE 0 END) AS E21,  -- commented out to show data in unknown area
+SUM(CASE WHEN WORKDEPT NOT IN ('A00','B01','C01','D11','D21','E01','E11'
+--,'E21' -- commented out to show data in unknown area
+) THEN 1 ELSE 0 END) AS WORKDEPT_NOT_KNOWN
+FROM DSN8910.EMP --EMP
+GROUP BY JOB;​
+```
+
+# 删除重复数据
+
+Table of data with duplicates. PK=(EMPNO, EMPNO_TSP):
+
+ delete where the row number > 1  and also to use the OLD TABLE so we see 
+  what was deleted.
+
+```markup
+SELECT EMPNO, EMPNO_TSP                                        
+FROM OLD TABLE                                                 
+(  DELETE FROM EMP2                                            
+   WHERE (EMPNO, EMPNO_TSP) IN                                 
+     (SELECT EMPNO, EMPNO_TSP                                  
+      FROM  (SELECT EMPNO, EMPNO_TSP, ROW_NUMBER ()            
+             OVER (PARTITION BY EMPNO ORDER BY EMPNO_TSP)      
+                                                    AS ROW_NBR 
+             FROM EMP2                                         
+             ORDER BY EMPNO                                    
+            )                                                  
+      WHERE ROW_NBR > 1                                        
+     )                                                         
+ )     
+```
+
+# 递归
+
+```
+WITH CTE_HIREYR_RANGE (YR, LVL) AS 
+   ( SELECT MIN(YEAR(HIREDATE)), 1 FROM EMP
+      UNION ALL
+     SELECT YR+1, LVL+1 FROM CTE_HIREYR_RANGE
+      WHERE YR < (SELECT MAX(YEAR(HIREDATE)) FROM EMP) -- 递归需要有终止条件
+        AND LVL < 999
+   )
+   , CTE_CNT_BY_HIREYR AS 
+   ( SELECT YEAR(HIREDATE) AS YR, COUNT(*) AS HIRE_CNT
+       FROM EMP E
+      GROUP BY YEAR(HIREDATE)
+   )
+SELECT R.YR AS YR, COALESCE(HIRE_CNT,0) AS HIRE_CNT
+FROM CTE_HIREYR_RANGE R
+LEFT OUTER JOIN CTE_CNT_BY_HIREYR C
+ON R.YR = C.YR
+ORDER BY YR;
+```
+
+
+
+# [Dynamic order direction](https://stackoverflow.com/questions/1147763/dynamic-order-direction)
+
+```sql
+ORDER BY
+      CASE WHEN @OrderDirection = 0 THEN 1
+      ELSE
+           CASE WHEN @OrderByColumn = 'AddedDate' THEN CONVERT(varchar(50), AddedDate)
+                WHEN @OrderByColumn = 'Visible' THEN CONVERT(varchar(2), Visible)
+                WHEN @OrderByColumn = 'AddedBy' THEN AddedBy
+                WHEN @OrderByColumn = 'Title' THEN Title
+           END
+      END ASC,
+      CASE WHEN @OrderDirection = 1 THEN 1
+      ELSE
+           CASE WHEN @OrderByColumn = 'AddedDate' THEN CONVERT(varchar(50), AddedDate)
+                WHEN @OrderByColumn = 'Visible' THEN CONVERT(varchar(2), Visible)
+                WHEN @OrderByColumn = 'AddedBy' THEN AddedBy           
+                WHEN @OrderByColumn = 'Title' THEN Title
+           END
+      END DESC
+```
+
+```sql
+SELECT
+     Columns you actually want
+FROM
+    (
+    SELECT
+         Columns you actually want,
+         ROW_NUMBER() OVER (ORDER BY AddedDate) AS AddedDateSort, -- 排序影响性能
+         ROW_NUMBER() OVER (ORDER BY Visible) AS VisibleSort,
+         ROW_NUMBER() OVER (ORDER BY AddedBy) AS AddedBySort,
+         ROW_NUMBER() OVER (ORDER BY Title) AS TitleSort
+    FROM
+         myTable
+    WHERE
+         MyFilters...
+    ) foo
+ORDER BY
+     CASE @OrderByColumn
+        WHEN 'AddedDate' THEN AddedDateSort
+        WHEN 'Visible' THEN VisibleSort    
+        WHEN 'AddedBy' THEN AddedBySort
+        WHEN 'Title' THEN TitleSort
+     END * @multiplier;
+```
 
 
 

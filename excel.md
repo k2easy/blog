@@ -616,3 +616,32 @@ smartbi 打开文件，最近使用的文件 列表
 
 
 
+[Excel 函数大全 - 懒人Excel](https://www.lanrenexcel.com/excel-functions-list/)
+
+
+
+
+
+设置单元格格式里，将需要不显示的边框颜色设置为白色
+
+![img](https://pic4.zhimg.com/761eaacb102c391cef03a21e3c880abf_b.jpg)
+
+
+
+| =ROUND(21.5,0) | 将 21.5四舍五入到整数 | 22   |
+| -------------- | --------------------- | ---- |
+|                |                       | a    |
+
+
+
+
+
+=VLOOKUP(lookup_value, table_array, col_index_num,[range_lookup]) =VLOOKUP(查找值, 单元格区域, 列数, [匹配模式])
+
+列数：返回值列，返回值在区域中的第几列
+
+![VLOOKUP 函数](https://www.lanrenexcel.com/wp-content/uploads/formula-vlookup-example-1.png)![VLOOKUP 函数](https://www.lanrenexcel.com/wp-content/uploads/formula-vlookup-example-2.png)
+
+精确匹配，即 FALSE（或0）
+
+​                    

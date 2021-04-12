@@ -129,6 +129,11 @@ C. 将参数绑定在单元格上（无法移除参数）
 
 
 
+
+
+
+
+
 	 电子表格拖拽字段到表格上后，字段的左父格和上父格都默认为“ 有
 	
 	 电子表格中为了让标题行在分页之后的每一页都还可以继续显示，C. 设置打印标题
@@ -3787,13 +3792,13 @@ function main(spreadsheetReport) {
 ​              } 
 ​       }
 ​       
-       setTimeout(function(){
-            var eChart = biChart.getChart();
-            eChart.setOption(option)
-    
-       },0)
-       
-    }
+​       setTimeout(function(){
+​            var eChart = biChart.getChart();
+​            eChart.setOption(option)
+​    
+​       },0)
+​       
+​    }
 2、柱形图 轮播 
 
 ```
@@ -4008,3 +4013,102 @@ function ifExistName(name) {
 
 
 ![img](https://wiki.smartbi.com.cn/download/attachments/47481469/image2019-10-29 17%3A43%3A31.png?version=1&modificationDate=1572342215000&api=v2)
+
+
+
+
+
+跳转规则 
+模版单元格没办法批量设置 B2,C2 
+没办法传递常量，只能借助额外的常量单元格
+传值时如果没有获取到该单元格（该单元格被服务端宏隐藏掉了，不存在），则子页面该参数显示的是空而不是默认值，{[ ]} 判断该参数为空 ，则内部表达式替换成1=1
+
+ 
+
+
+
+![image-20210318095431315](/Users/demo/Library/Application%20Support/typora-user-images/image-20210318095431315.png)
+
+
+
+
+
+对过滤表达式增加括号，要求同时选中2条或2条以上表达式时才能使用括号（按住Ctrl键可选择多条表达式。）
+
+
+
+
+
+由于Excel2007自身对数据行数是有限制的，最大行数为1048576。所以系统选项里的“Excel2007最大导出行数”最大不能超过1048576。
+
+
+
+自助ETL
+自定义SQL 仅支持查询, delete , trunk,存储过程都不支持。
+
+仅支持查询不支持字段别名
+
+
+
+
+
+漏洞修复
+
+# CVE-2020-15778 openssh漏洞修复
+
+1.升级到openssh-8.4以上的版本
+（要求操作系统版本在centos 8及以上）
+
+或者 2.禁用scp命令
+mv /usr/bin/scp /usr/bin/no_use_scp
+然后本机执行scp或是从其他机器往本机执行scp都会提示command not found
+
+禁用scp后可以用rsync等命令替代
+————————————————
+版权声明：本文为CSDN博主「N07ME」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
+原文链接：https://blog.csdn.net/N07ME/article/details/111034326
+
+tomcat 10
+
+
+
+smartbi 缺少回收站，误删资源找回
+
+
+
+
+
+## 新增 工具条按钮
+
+```
+function main(spreadsheetReport, spreadsheetReportContext) {
+    // 在快捷工具栏上添加新按钮
+    if (!spreadsheetReport.addPrint) {
+        var td =spreadsheetReport.elem_btnPrint.parentNode;
+        var goBtn = document.createElement('input');
+        goBtn.setAttribute("type", "button");
+        goBtn.className = "button-buttonbar ";
+        goBtn.value = " 打印  ";
+        spreadsheetReport.addListener(goBtn, "click",
+        function() {
+            spreadsheetReport.doPrint(true, false);
+        });
+        td.appendChild(goBtn);
+        spreadsheetReport.addPrint = true;
+    }
+};
+```
+
+
+
+
+
+```sql
+( SELECT KEY_FIELD_1,LOOKUP_FIELD_1  
+FROM TABLE_1  
+WHERE FILTER_FIELD = '1' )  
+EXCEPT  
+( SELECT KEY FIELD_2,LOOKUP_FIELD_2  
+FROM TABLE_2 )
+```
+

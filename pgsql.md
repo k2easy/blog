@@ -1,14 +1,10 @@
 #  PostgreSQL 13 Released!
 
-Posted on **2020-09-24** by PostgreSQL Global Development Group
-
-In PostgreSQL 13, more types of [aggregate](https://www.postgresql.org/docs/13/functions-aggregate.html) and [grouping set](https://www.postgresql.org/docs/13/queries-table-expressions.html#QUERIES-GROUPING-SETS) queries can leverage PostgreSQL’s efficient hash aggregation functionality, as queries with large aggregates do not have to fit entirely into memory. Queries with [partitioned tables](https://www.postgresql.org/docs/13/ddl-partitioning.html) have received a performance boost, as there are now more cases where partitions can be pruned and where partitions can be directly joined.
-
  [`datetime()`](https://www.postgresql.org/docs/13/functions-json.html#FUNCTIONS-SQLJSON-OP-TABLE) function to its SQL/JSON path support, which converts valid time formats  to PostgreSQL-native types.
 
 [`gen_random_uuid()`](https://www.postgresql.org/docs/13/functions-uuid.html), is now available without having to install any extensions.
 
-PostgreSQL’s partitioning system is more flexible, as partitioned tables fully support logical replication and BEFORE row-level triggers.
+
 
 #  手册
 
@@ -33,12 +29,16 @@ dropdb mydb
 
 运行PostgreSQL的交互式终端程序，它被称为*psql*， 它允许你交互地输入、编辑和执行SQL命令。      
 
-psql --help
+ 
 
 ```
 psql -V ,--version
 psql -l ,--list 
+psql --help
+
 ```
+
+##  安装遇到问题
 
 $ psql -l
 psql: error: could not connect to server: could not connect to server: No such file or directory
@@ -48,10 +48,6 @@ psql: error: could not connect to server: could not connect to server: No such f
 To change the password, simply type `sudo passwd postgres` and set up a new password.
 
 wiki 不利于入门，先学习 http://postgresguide.com/setup/users.html
-
-
-
-# install
 
 brew install postgresql
 brew info postgresql
@@ -70,11 +66,9 @@ This formula has created a default database cluster with:
 brew services --help
 brew services list 
 
+ 
 
-
-psql -h localhost -p 5432
-
-
+psql -h localhost -p 5432 
 
 ls /usr/local/bin | grep 'postgre*' // postgres
 
@@ -128,12 +122,9 @@ brew list --formula | grep "postgre*"
 
 
 postgrest
-Serves a fully RESTful API from any existing PostgreSQL database
+Serves a fully RESTful API from any existing PostgreSQL database 
 
-
-
-brew install postgresql
-postges --version //13.0
+brew install postgresql 
 
 安装过程中自动创建默认数据库存储目录 *"/usr/local/var/postgres"* ,若无则自创建
 initdb /usr/local/var/postgres， **create a physical PostgreSQL Database**
@@ -155,6 +146,41 @@ exit;
 ```
 
 navicat 链接 localhost 5432 , initial database: postgres ,user:demo ,password: 无。
+
+ 
+
+```
+psql --help
+psql is the PostgreSQL interactive terminal.
+
+Usage:
+  psql [OPTION]... [DBNAME [USERNAME]]
+
+General options:
+  -c, --command=COMMAND    run only single command (SQL or internal) and exit
+  -d, --dbname=DBNAME      database name to connect to (default: "demo")
+  -f, --file=FILENAME      execute commands from file, then exit
+  -l, --list               list available databases, then exit
+  -v, --set=, --variable=NAME=VALUE
+                           set psql variable NAME to VALUE
+                           (e.g., -v ON_ERROR_STOP=1)
+  -V, --version            output version information, then exit
+  -X, --no-psqlrc          do not read startup file (~/.psqlrc)
+  -1 ("one"), --single-transaction
+                           execute as a single transaction (if non-interactive)
+  -?, --help[=options]     show this help, then exit
+      --help=commands      list backslash commands, then exit
+      --help=variables     list special variables, then exit
+      
+ type "\?" (for internal commands) or "\help" (for SQL
+commands) from within psql,
+```
+
+```
+pgsql -h localhost -p 5432 -d pgguide
+pgguide=# \?
+pgguide=#
+```
 
 
 
@@ -346,10 +372,12 @@ jsonb_pretty(yourcolumnhere). This will take care of making that huge JSON blob 
 -   Timestamp with Timezone (2012-04-25 13:00:00.00 PST)
 -   Interval - A span of time (4 days)
 
+\df date_* 显示date_相关函数
+
 ## date_trunc
 
 ```sql
- SELECT count(*), date_trunc('day', created_at)
+SELECT count(*), date_trunc('day', created_at)
 FROM users
 GROUP BY 2
 ORDER BY 2 DESC;
@@ -363,7 +391,7 @@ ORDER BY 2 DESC;
 WHERE created_at >= (now() - interval '1 month');
 //1 day , 1 days ,1 week 
 
-select date_trunc('week',now() - interval '1 day'); -- 取出的是这周的周一日期
+select date_trunc('week',now() - interval '1 day'); -- week 今年的第几周
 
 -- 每周注册用户数
 SELECT date_trunc('week', created_at),
@@ -402,14 +430,8 @@ timestamps、timestamptz（with timezone embedded in）推荐
 ## extract 
 
 ```sql
- 
-select date_part('month', timestamp '2001-02-16 20:38:40')
-
+ select date_part('month', timestamp '2001-02-16 20:38:40')
 ```
-
-
-
-
 
 
 
@@ -679,9 +701,7 @@ SELECT id, (data->>'a')::int AS a, (data->>'b')::int AS b
 FROM   test;
 ```
 
- 
-
-
+  
 
 # TEMP TABLE
 
@@ -689,11 +709,7 @@ FROM   test;
 CREATE TEMP TABLE obj(a int, b int, c int, d int);
 ```
 
-
-
-
-
-
+ 
 
 # create table
 
@@ -1502,4 +1518,15 @@ or even shorter:
 ```sql
 select i::date from generate_series('2012-06-29', 
   '2012-07-03', '1 day'::interval) i
+```
+
+
+
+
+
+```sql
+ALTER TABLE place
+  MODIFY( street_name VARCHAR2(20),
+          county      VARCHAR2(20),
+          city        VARCHAR2(20) )
 ```

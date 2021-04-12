@@ -678,3 +678,44 @@ EOF
 
 
 
+# Mysql常用语法
+
+行号
+
+```sql
+SELECT    first_name,
+          age,
+          gender,
+          @curRank := @curRank + 1 AS rank
+FROM      person p, (SELECT @curRank := 0) r
+ORDER BY  age;
+```
+
+
+
+After Mysql 8.0 you can use Rank function
+
+```sql
+ RANK() OVER (
+    ORDER BY column_name
+) my_rank
+
+RANK() OVER (
+PARTITION BY <expression>[{,<expression>...}]
+ORDER BY <expression> [ASC|DESC], [{,<expression>...}]
+)
+```
+
+```sql
+select result.id,result.login,result.rank from (
+  SELECT    id,
+              login,
+              IF(login=@last,@curRank:=@curRank,@curRank:=@_sequence) AS rank,
+              @_sequence:=@_sequence+1,
+              @last:=login
+    FROM      ds , (SELECT @curRank := 1, @_sequence:=1, @last:=0) r
+    ORDER BY  id asc) as result;
+```
+
+
+
