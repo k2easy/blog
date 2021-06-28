@@ -868,7 +868,168 @@ CLI 的构建过程会运行相关的预处理器。
 
 
 
-
+## ng-content
 
 一个是 UI 库（React），另一个是成熟的前端框架（Angular），而其中最年轻的（Vue）则可以称之为渐进式框架。
+
+
+
+```
+ng build my-app -c production
+build	b
+generate	g
+serve	s
+version	v
+new	n
+```
+
+`ng-container` 元素是一个逻辑结构，可用于对其他 DOM 元素进行分组；但是，`ng-container` 本身未在 DOM 树中渲染。
+
+
+
+  通过ng-content的select属性可以指定html标签或者组件投射ng-content位置上来。但是呢有个限制条件。不管是select标签或者组件的名字、或者class、或者是属性他们都是作用在直接子节点上。
+
+```
+// 下面中情况下 ng-content没有投射到对应的内容
+<app-content-section>
+    <ng-container>
+        <app-content-child [title]="'测试下'"></app-content-child>
+    </ng-container>
+</app-content-section>
+
+// 通过使用 ngProjectAs 让ng-content的内容能正确的投射过来。
+<app-content-section>
+    <ng-container ngProjectAs="app-content-child">
+        <app-content-child [title]="'测试下'"></app-content-child>
+    </ng-container>
+</app-content-section>
+
+
+@Component({
+    selector: 'app-content-section',
+    template: `
+        <div> 
+                <ng-content select="app-content-child"></ng-content>
+```
+
+ ng-conent提供了@ContentChild和@ContentChildren来获取ng-conent里面包含的组件(类似@ViewChild和@ViewChildren)。
+
+## ng-template
+
+定义的模板默认是不会在页面上显示出来的。，需要通过其他结构型指令（如 ng-if）或 TemplateRef、ViewContainerRef 将模块内容渲染到页面中。
+
+```
+<!-- 通过ngIf结构型指令显示ng-template的内容 -->
+<div class="lessons-list" *ngIf="condition else elseTemplate">
+    判断条件为真
+</div>
+<ng-template #elseTemplate>
+    <div>判断条件为假</div>
+</ng-template>
+```
+
+## @ViewChild
+
+获得子组件，使用其中的方法。
+
+```
+@Component({
+  selector: 'app-countdown-parent-vc',
+  template: `
+  <h3>Countdown to Liftoff (via ViewChild)</h3>
+  <button (click)="start()">Start</button>
+  <button (click)="stop()">Stop</button>
+  <div class="seconds">{{ seconds() }}</div>
+  <app-countdown-timer></app-countdown-timer>
+  `,
+  styleUrls: ['../assets/demo.css']
+})
+export class CountdownViewChildParentComponent implements AfterViewInit {
+
+  @ViewChild(CountdownTimerComponent)
+  private timerComponent: CountdownTimerComponent;
+
+  seconds() { return 0; }
+
+  ngAfterViewInit() {
+    // Redefine `seconds()` to get from the `CountdownTimerComponent.seconds` ...
+    // but wait a tick first to avoid one-time devMode
+    // unidirectional-data-flow-violation error
+    setTimeout(() => this.seconds = () => this.timerComponent.seconds, 0);
+  }
+
+  start() { this.timerComponent.start(); }
+  stop() { this.timerComponent.stop(); }
+}
+```
+
+## 父子组件通过服务来通讯
+
+```
+  constructor(private missionService: MissionService) {
+    missionService.missionConfirmed$.subscribe(
+      astronaut => {
+        this.history.push(`${astronaut} confirmed the mission`);
+      });
+  }
+```
+
+# 投影 
+
+有条件的内容投影，
+如果你的组件需要*有条件地*渲染内容或多次渲染内容，则应配置该组件以接受一个 `ng-template` 元素，其中包含要有条件渲染的内容。
+
+在显式渲染 `ng-template` 元素之前，Angular 不会初始化该元素的内容。
+本示例使用 `ngTemplateOutlet` 指令来渲染给定的 `ng-template` 元素，参考源码demo示例
+
+ `ng-container`  组件不需要渲染真实的 DOM 元素。
+
+组件可以使用 [`@ContentChild`](https://angular.cn/api/core/ContentChild) 或 [`@ContentChildren`](https://angular.cn/api/core/ContentChildren) 装饰器获得对此模板内容的引用（即 [`TemplateRef`](https://angular.cn/api/core/TemplateRef)）。
+
+
+
+## ngProjectAs
+
+`ng-container` 元素是一个逻辑结构，可用于对其他 DOM 元素进行分组；但是，`ng-container` 本身未在 DOM 树中渲染。
+
+通常会使用属性、元素、CSS 类或这三者的某种组合来标识将内容投影到何处
+
+例如，你要投影的内容可能是另一个元素的子元素。你可以用 `ngProjectAs` 属性来完成此操作。
+
+```
+<ng-container ngProjectAs="question">
+	<p>text...</p>
+</ng-container>
+```
+
+# 动态组件
+
+示例：广告电子版 动态的广告内容
+
+`@ViewChildren` == your own child ; `@ContentChildren` == someone's else child 
+
+```
+export class AdDirective {
+  constructor(public viewContainerRef: ViewContainerRef) { }
+}
+```
+
+`AdDirective` 注入了 `ViewContainerRef` 来获取对容器视图的访问权，这个容器就是那些动态加入的组件的宿主。
+
+```
+export class AdItem {
+  constructor(public component: Type<any>, public data: any) {}
+}
+Type<any> 用来声明 class 类
+```
+
+
+
+
+
+
+
+
+
+
 

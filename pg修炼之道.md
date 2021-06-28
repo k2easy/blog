@@ -47,14 +47,37 @@ PostgreSQL可以搭建同步备库  异步备库 延迟备库
 
 RedHat安装 
 
+1. 
 
 
 
 
-navicat 
+TOAST是**“The Oversized-Attribute Storage Technique”（超尺寸属性存储技术）**的缩写，主要用于存储一个大字段的值。
 
-idea 
+要理解TOAST，我们要先理解**页（BLOCK）**的概念。在PG中，页是数据在文件存储中的基本单位， 默认的大小为8KB。同时，PG不允许一行数据跨页存储。那么对于超长的行数据，PG就会启动TOAST，将大的字段压缩或切片成多个物理行存到另一张系统表中（**TOAST表**），这种存储方式叫**行外存储**。
 
-office 
 
- 
+
+禁用索引扫描 
+
+```
+SET enable_indexscan = False;
+EXPLAIN SELECT * FROM table WHERE indexed_column='some_value';
+```
+
+
+
+
+
+### EDB
+
+数据库平台提供商 EnterpriseDB （EDB）  都基于开源数据库服务器 PostgreSQL 为企业级客户提供商业服务， 技术团队包含大部分 PostgreSQL 社区的主要贡献者。 
+
+EDB. Power to Postgres
+
+工具 ： Postgres Enterprise Manager 数据库监控管理工具 
+
+SQL profile  
+
+
+

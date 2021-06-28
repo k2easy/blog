@@ -1900,57 +1900,1064 @@ def fact_iter(num, product):
 
 >>> L = list(range(100))
 
+前10个数，每两个取一个
+>>> L[:10:2]
+
+```
+
+`[:] `原样复制一个list
+
+tuple也是一种list，唯一区别是tuple不可变。因此，tuple也可以用切片操作，只是操作的结果仍是tuple：
+
+```
+>>> (0, 1, 2, 3, 4, 5)[:3]
+(0, 1, 2)
+```
+
+字符串`'xxx'`也可以看成是一种list，每个元素就是一个字符。因此，字符串也可以用切片操作，只是操作结果仍是字符串：
+
+```
+>>> 'ABCDEFG'[::2]
+'ACEG'
+```
+
+在很多编程语言中，针对字符串提供了很多各种截取函数（例如，substring），其实目的就是对字符串切片。Python没有针对字符串的截取函数，只需要切片一个操作就可以完成，非常简单。
+
+#### 迭代
+
+```
+>>> for ch in 'ABC':
+       print(ch)
+```
+
+```
+>>> from collections import Iterable
+>>> isinstance('abc', Iterable) # str是否可迭代
+True
+>>> isinstance([1,2,3], Iterable) # list是否可迭代
+True
+>>> isinstance(123, Iterable) # 整数是否可迭代
+False
+```
+
+```
+>>> for i, value in enumerate(['A', 'B', 'C']):
+...     print(i, value)
+```
+
+#### 列表生成式
+
+```
+>>> list(range(1, 11))
+[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+>>> for x in range(1, 11):
+...    L.append(x * x)
+
+但是循环太繁琐，而列表生成式则可以用一行语句代替循环生成上面的list
+>>> [x * x for x in range(1, 11)]
+
+>>> [x * x for x in range(1, 11) if x % 2 == 0] #筛选出仅偶数的平方
+[4, 16, 36, 64, 100]
+
+两层循环，可以生成全排列：
+>>> [m + n for m in 'ABC' for n in 'XYZ']
+['AX', 'AY', 'AZ', 'BX', 'BY', 'BZ', 'CX', 'CY', 'CZ']
+```
+
+```
+>>> import os  
+>>> [d for d in os.listdir('.')] # os.listdir可以列出文件和目录
+```
+
+```
+>>> d = {'x': 'A', 'y': 'B', 'z': 'C' }
+>>> for k, v in d.items():
+...     print(k, '=', v)
+```
+
+```
+>>> d = {'x': 'A', 'y': 'B', 'z': 'C' }
+>>> [k + '=' + v for k, v in d.items()]
+['y=B', 'x=A', 'z=C']
+```
+
+```
+>>> [x if x % 2 == 0 else -x for x in range(1, 11)]
+[-1, 2, -3, 4, -5, 6, -7, 8, -9, 10]
+在一个列表生成式中，for前面的if ... else是表达式，而for后面的if是过滤条件，不能带else。
+```
+
+
+
+#### 生成器
+
+通过列表生成式，我们可以直接创建一个列表。但是，受到内存限制，列表容量肯定是有限的。而且，创建一个包含100万个元素的列表，不仅占用很大的存储空间，如果我们仅仅需要访问前面几个元素，那后面绝大多数元素占用的空间都白白浪费了。
+
+所以，如果列表元素可以按照某种算法推算出来，那我们是否可以在循环的过程中不断推算出后续的元素呢？这样就不必创建完整的list，从而节省大量的空间。在Python中，这种一边循环一边计算的机制，称为生成器：generator。
+
+可以通过`next()`函数获得generator的下一个返回值,直到计算到最后一个元素，没有更多的元素时，抛出`StopIteration`的错误。
+
+```
+>>> g = (x*x for x in range(1,10) )
+>>> g
+<generator object <genexpr> at 0x103f79740>
+>>> next(g)  
+1
+```
+
+创建`L`和`g`的区别仅在于最外层的`[]`和`()`，`L`是一个list，而`g`是一个generator。
+
+```
+>>> g = (x * x for x in range(10))
+>>> for n in g:
+...     print(n)
+```
+
+创建了一个generator后，基本上永远不会调用`next()`，而是通过`for`循环来迭代它，并且不需要关心`StopIteration`的错误。
+
+
+
+generator和函数的执行流程不一样。函数是顺序执行，遇到`return`语句或者最后一行函数语句就返回。而变成generator的函数，在每次调用`next()`的时候执行，遇到`yield`语句返回，再次执行时从上次返回的`yield`语句处继续执行。
+
+```
+def odd():
+    print('step 1')
+    yield 1
+    print('step 2')
+    yield(3)
+    print('step 3')
+    yield(5)
+```
+
+调用该generator时，首先要生成一个generator对象，然后用`next()`函数不断获得下一个返回值：
+
+```
+>>> o = odd()
+>>> next(o)
+step 1
+1
+>>> next(o)
+step 2
+3
+>>> next(o)
+step 3
+5
+>>> next(o)
+Traceback (most recent call last):
+  File "<stdin>" 
+```
+
+示例：
+
+斐波拉契数列用列表生成式写不出来，但是，用函数把它打印出来却很容易：
+
+```
+def fib(max):
+    n, a, b = 0, 0, 1
+    while n < max:
+        print(b)
+        a, b = b, a + b
+        n = n + 1
+    return 'done'
 ```
 
 
 
 
 
+赋值语句：
+
+```
+a, b = b, a + b
+```
+
+相当于：
+
+```
+t = (b, a + b) # t是一个tuple
+a = t[0]
+b = t[1]
+```
+
+但不必显式写出临时变量t就可以赋值。
+
+```
+def fib(max):
+    n, a, b = 0, 0, 1
+    while n < max:
+        yield b
+        a, b = b, a + b
+        n = n + 1
+    return 'done'
+>>> g = fib(6)
+>>> while True:
+...     try:
+...         x = next(g)
+...         print('g:', x)
+...     except StopIteration as e:
+...         print('Generator return value:', e.value)
+...         break
+```
+
+#### 迭代器
+
+可以直接作用于`for`循环的数据类型有以下几种：
+
+一类是集合数据类型，如`list`、`tuple`、`dict`、`set`、`str`等；
+
+一类是`generator`，包括生成器和带`yield`的generator function。
+
+这些可以直接作用于`for`循环的对象统称为可迭代对象：`Iterable`。
+
+可以使用`isinstance()`判断一个对象是否是`Iterable`对象：
+
+```
+>>> isinstance([], Iterable)
+True
+```
+
+而生成器不但可以作用于`for`循环，还可以被`next()`函数不断调用并返回下一个值，直到最后抛出`StopIteration`错误表示无法继续返回下一个值了。
+
+可以被`next()`函数调用并不断返回下一个值的对象称为迭代器：`Iterator`。
+
+```
+>>> from collections.abc import Iterator
+>>> isinstance((x for x in range(10)), Iterator)
+True
+```
+
+Python的`Iterator`对象表示的是一个数据流，不能提前知道序列的长度，只能不断通过`next()`函数实现按需计算下一个数据，所以`Iterator`的计算是惰性的，只有在需要返回下一个数据时它才会计算。
+
+把`list`、`dict`、`str`等`Iterable`变成`Iterator`可以使用`iter()`函数：
+
+```
+>>> isinstance(iter([]), Iterator)
+True
+>>> isinstance(iter('abc'), Iterator)
+True
+```
+
+# 函数式编程
+
+Functional Programming，虽然也可以归结到面向过程的程序设计，但其思想更接近数学计算。
+
+函数式编程的一个特点就是，允许把函数本身作为参数传入另一个函数，还允许返回一个函数！
+
+#### 高阶函数
+
+### 变量可以指向函数
+
+```
+>>> f = abs
+>>> f
+<built-in function abs>
+>>> f(-10)
+10
+```
+
+#### 函数名也是变量
+
+一个函数就可以接收另一个函数作为参数，这种函数就称之为高阶函数。
+
+```
+def add(x, y, f):
+    return f(x) + f(y)
+
+print(add(-5, 6, abs))
+```
+
+#### map/reduce
+
+“[MapReduce: Simplified Data Processing on Large Clusters](http://research.google.com/archive/mapreduce.html)”
+
+Python内建了`map()`和`reduce()`函数。
+`map()`函数接收两个参数，一个是函数，一个是`Iterable`，`map`将传入的函数依次作用到序列的每个元素，并把结果作为新的`Iterator`返回。
+
+```
+def f(x):
+    return x*x
+r = map(f,[1,2,3])
+print(list(r)) # 直接打印r是个iterator object ，list转换
+```
+
+```
+>>> list(map(str, [1, 2, 3, 4, 5, 6, 7, 8, 9]))
+['1', '2', '3', '4', '5', '6', '7', '8', '9']
+```
+
+
+
+`reduce`把一个函数作用在一个序列`[x1, x2, x3, ...]`上，这个函数必须接收两个参数，`reduce`把结果继续和序列的下一个元素做累积计算
+
+```
+>>> from functools import reduce
+>>> def add(x, y):
+...     return x + y
+...
+>>> reduce(add, [1, 3, 5, 7, 9])
+25
+
+>>> def fn(x, y):
+...     return x * 10 + y
+...
+>>> reduce(fn, [1, 3, 5, 7, 9])
+13579
+```
+
+
+
+`filter()`把传入的函数依次作用于每个元素，然后根据返回值是`True`还是`False`决定保留还是丢弃该元素。
+
+```
+def is_odd(n):
+    return n % 2 == 1
+
+list(filter(is_odd, [1, 2, 4, 5, 6, 9, 10, 15]))
+# 结果: [1, 5, 9, 15]
+
+
+def not_empty(s):
+    return s and s.strip()
+
+list(filter(not_empty, ['A', '', 'B', None, 'C', '  ']))
+```
+
+
+
+`sorted()`函数也是一个高阶函数，它还可以接收一个`key`函数来实现自定义的排序，例如按绝对值大小排序：
+
+```
+>>> sorted([36, 5, -12, 9, -21], key=abs)
+[5, 9, -12, -21, 36]
+```
+
+默认情况下，对字符串排序，是按照ASCII的大小比较的，由于`'Z' < 'a'`，结果，大写字母`Z`会排在小写字母`a`的前面。
+
+```
+>>> sorted(['bob', 'about', 'Zoo', 'Credit'], key=str.lower)
+['about', 'bob', 'Credit', 'Zoo']
+
+>>> sorted(['bob', 'about', 'Zoo', 'Credit'], key=str.lower, reverse=True)
+['Zoo', 'Credit', 'bob', 'about']
+```
+
+#### 返回函数
+
+### 函数作为返回值
+
+```
+def lazy_sum(*args):
+    def sum():
+        ax = 0
+        for n in args:
+            ax = ax + n
+        return ax
+    return sum
+    
+>>> f = lazy_sum(1, 3, 5, 7, 9)
+>>> f
+<function lazy_sum.<locals>.sum at 0x101c6ed90>
+调用函数f时，才真正计算求和的结果：
+
+>>> f()
+25
+```
+
+在函数`lazy_sum`中又定义了函数`sum`，并且，内部函数`sum`可以引用外部函数`lazy_sum`的参数和局部变量，**当`lazy_sum`返回函数`sum`时，相关参数和变量都保存在返回的函数中**，这种称为“闭包（Closure）”的程序结构拥有极大的威力。
+
+
+
+ 返回闭包时牢记一点：返回函数不要引用任何循环变量，或者后续会发生变化的变量。
+
+```
+def count():
+    fs = []
+    for i in range(1, 4):
+        def f():
+             return i*i
+        fs.append(f)
+    return fs
+
+f1, f2, f3 = count()# 9 9 9 
+# 返回的函数引用了变量i，但它并非立刻执行。等到3个函数都返回时，它们所引用的变量i已经变成了3，因此最终结果为9。
+```
+
+解决，立即执行，外层包裹一层
+
+```
+def count():
+    def f(j):
+        def g():
+            return j*j
+        return g
+    fs = []
+    for i in range(1, 4):
+        fs.append(f(i)) # f(i)立刻被执行，因此i的当前值被传入f()
+    return fs
+```
+
+#### 匿名函数
+
+```
+>>> list(map(lambda x: x * x, [1, 2, 3, 4, 5, 6, 7, 8, 9]))
+```
+
+匿名函数`lambda x: x * x`实际上就是：
+
+```
+def f(x):
+    return x * x
+```
+
+## 错误处理
+
+raise
+
+把`print()`替换为`logging`，`logging`不会抛出错误，而且可以输出到文件：
+
+```
+import logging
+logging.basicConfig(level=logging.INFO) # debug，info，warning，error等
+```
+
+`logging`的另一个好处是通过简单的配置，一条语句可以同时输出到不同的地方，比如console和文件
+
+ide 调试 vscode python插件
+
+# IO编程
+
+## 文件读写
+
+使用异步IO来编写程序性能会远远高于同步IO，但是异步IO的缺点是编程模型复杂。
+
+操作IO的能力都是由操作系统提供的，每一种编程语言都会把操作系统提供的低级C接口封装起来方便使用，Pyt
+
+```
+try:
+    f = open('/path/to/file', 'r') # read
+    print(f.read())
+finally:
+    if f:
+        f.close()
+```
+
+用`read()`方法可以一次读取文件的全部内容，Python把内容读到内存，用一个`str`对象表示：
+
+`close()`方法关闭文件。文件使用完毕后必须关闭，因为文件对象会占用操作系统的资源，并且操作系统同一时间能打开的文件数量也是有限的：
+
+```
+Python引入了with语句来自动帮我们调用close()方法：
+
+with open('/path/to/file', 'r') as f:
+    print(f.read())
+```
+
+```
+read(size)`方法，每次最多读取size个字节的内容。 调用`readline()`可以每次读取一行内容，调用`readlines()`一次读取所有内容并按行返回`list
+```
+
+配置文件，调用`readlines()`最方便：
+
+```
+for line in f.readlines():
+    print(line.strip()) # 把末尾的'\n'删掉
+```
+
+```
+>>> f = open('/Users/michael/test.jpg', 'rb') # binary file
+```
+
+```
+>>> f = open('/Users/michael/gbk.txt', 'r', encoding='gbk')
+
+>>> f = open('/Users/michael/gbk.txt', 'r', encoding='gbk', errors='ignore')
+```
+
+```
+with open('/Users/michael/test.txt', 'w') as f:
+    f.write('Hello, world!')
+```
+
+以`'w'`模式写入文件时，如果文件已存在，会直接覆盖（相当于删掉后新写入一个文件）。如果我们希望追加到文件末尾怎么办？可以传入`'a'`以追加（append）模式写入。
+
+### StringIO
+
+很多时候，数据读写不一定是文件，也可以在内存中读写。
+
+StringIO顾名思义就是在内存中读写str。
+
+```
+>>> from io import StringIO
+>>> f = StringIO()
+>>> f.write('hello')
+>>> print(f.getvalue())
+```
+
+BytesIO实现了在内存中读写bytes，我们创建一个BytesIO，然后写入一些bytes：
+
+```
+>>> from io import BytesIO
+>>> f = BytesIO()
+>>> f.write('中文'.encode('utf-8'))
+```
+
+### 操作文件和目录
+
+```
+>>> import os
+>>> os.name # 操作系统类型
+'posix'
+```
+
+如果是`posix`，说明系统是`Linux`、`Unix`或`Mac OS X`，如果是`nt`，就是`Windows`系统
+
+```
+>>> os.uname()
+```
+
+注意`uname()`函数在Windows上不提供，也就是说，`os`模块的某些函数是跟操作系统相关的。
+
+在操作系统中定义的环境变量，全部保存在`os.environ`这个变量中，可以直接查看：
+
+```
+>>> os.environ
+>>> os.environ.get('PATH')
+
+```
+
+```
+# 查看当前目录的绝对路径:
+>>> os.path.abspath('.')
+'/Users/michael'
+# 在某个目录下创建一个新目录，首先把新目录的完整路径表示出来:
+>>> os.path.join('/Users/michael', 'testdir')
+'/Users/michael/testdir'
+# 然后创建一个目录:
+>>> os.mkdir('/Users/michael/testdir')
+# 删掉一个目录:
+>>> os.rmdir('/Users/michael/testdir')
+```
+
+`os.path.split()`函数使用系统路径分隔符，拆分路径字符串为两部分，后一部分总是最后级别的目录或文件名：
+
+```
+>>> os.path.split('/Users/michael/testdir/file.txt')
+('/Users/michael/testdir', 'file.txt')
+```
+
+`os.path.splitext()`可以直接让你得到文件扩展名，很多时候非常方便：
+
+```
+>>> os.path.splitext('/path/to/file.txt')
+('/path/to/file', '.txt')
+```
+
+```
+# 对文件重命名:
+>>> os.rename('test.txt', 'test.py')
+# 删掉文件:
+>>> os.remove('test.py')
+```
+
+`shutil`模块提供了`copyfile()`的函数
+
+列出当前目录下的所有目录，只需要一行代码：
+
+```
+>>> [x for x in os.listdir('.') if os.path.isdir(x)]
+['.lein', '.local', '.m2', '.npm', '.ssh', '.Trash', '.vim', 'Applications', 'Desktop', ...]
+```
+
+要列出所有的`.py`文件，也只需一行代码：
+
+```
+>>> [x for x in os.listdir('.') if os.path.isfile(x) and os.path.splitext(x)[1]=='.py']
+['apis.py', 'config.py', 'models.py', 'pymonitor.py', 'test_db.py', 'urls.py', 'wsgiapp.py']
+```
+
+####  序列化
+
+变量从内存中变成可存储或传输的过程称之为序列化，在Python中叫pickling，在其他语言中也被称之为serialization，marshalling，flattening等等
+
+序列化之后，就可以把序列化后的内容写入磁盘，或者通过网络传输到别的机器上。
+
+反过来，把变量内容从序列化的对象重新读到内存里称之为反序列化，即unpickling。
+
+```
+>>> import pickle
+>>> d = dict(name='Bob', age=20, score=88)
+>>> pickle.dumps(d)
+b'\x80\x03}q\x00(X\x03
+
+>>> f = open('dump.txt', 'wb')
+>>> pickle.dump(d, f)
+>>> f.close()
+
+>>> f = open('dump.txt', 'rb')
+>>> d = pickle.load(f)
+>>> f.close()
+>>> d
+{'age': 20, 'score': 88, 'name': 'Bob'}
+```
+
+**JSON**
+
+| JSON类型   | Python类型 |
+| :--------- | :--------- |
+| {}         | dict       |
+| []         | list       |
+| "string"   | str        |
+| 1234.56    | int或float |
+| true/false | True/False |
+| null       | None       |
+
+```
+>>> import json
+>>> d = dict(name='Bob', age=20, score=88)
+>>> json.dumps(d)
+'{"age": 20, "score": 88, "name": "Bob"}'
+```
+
+```
+>>> json_str = '{"age": 20, "score": 88, "name": "Bob"}'
+>>> json.loads(json_str)
+```
+
+由于JSON标准规定JSON编码是UTF-8，所以我们总是能正确地在Python的`str`与JSON的字符串之间转换。
+
+
+
+# pandas xlsm
+
+```python
+import pandas as pd, os, MySQLdb
+
+# Your directory
+mydir = (os.getcwd()).replace('\\','/') + '/'
+
+df=pd.read_excel(r''+ mydir +'Book1.xlsm')
+print(df)
+
+# Establish a MySQL connection
+database = MySQLdb.connect (host="127.0.0.1", user = "root", passwd = "", db = "myDB")
+print(database)
+# Get the cursor, which is used to traverse the database, line by line
+cursor = database.cursor()
+
+# Create the INSERT INTO sql query
+query = """INSERT INTO myTable (name, email) VALUES ( %s, %s)"""
+
+for i in range(len(df)):
+    name=df['name'][i]
+    email=df['email'][i]
+
+    # Assign values from each row
+    values=(name, email)
+    # Execute sql Query
+    cursor.execute(query, values)
+
+# Close the cursor
+cursor.close()
+
+# Commit the transaction
+database.commit()
+
+# Close the database connection
+database.close()
+```
+
+
+
+# pandas get started
+
+**usecols** int, str, list-like, or callable default None
+
+- If None, then parse all columns.
+
+Pandas 的主要数据结构是 [Series (opens new window)](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Series.html#pandas.Series)（一维数据）与 [DataFrame (opens new window)](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame)（二维数据），这两种数据结
+
+- Pandas 速度**很快**。Pandas 的很多底层算法都用 [Cython (opens new window)](https://cython.org/)优化过。然而，为了保持通用性，必然要牺牲一些性能，如果专注某一功能，完全可以开发出比 Pandas 更快的专用工具。
+- Pandas 是 [statsmodels (opens new window)](https://www.statsmodels.org/stable/index.html)的依赖项，因此，Pandas 也是 Python 中统计计算生态系统的重要组成部分。
+- Pandas 已广泛应用于金融领域。
+
+
+
+```py
+MyID = 'X12345'    
+MasterFile_Name = r'C:\Users\ABC\{}\DEF\File - Test.xlsx'.format(MyID)    
+print(MasterFile_Name)
+```
+
+缺失数据为 NaN
+
+pandas is **fast**. Many of the low-level algorithmic bits have been extensively tweaked in [Cython](https://cython.org/) code.
+
+```
+for col in df.columns:
+    series = df[col]
+    # do something with serie
+```
+
+```
+ ages = pd.Series([22, 35, 58], name="Age") # Each column in a DataFrame is a Series
+
+ In [2]: df = pd.DataFrame( #  A table of data is stored as a pandas DataFrame,tabular data
+   ...:     {
+   ...:         "Name": [
+   ...:             "Braund, Mr. Owen Harris",
+   ...:             "Allen, Mr. William Henry",
+   ...:             "Bonnell, Miss. Elizabeth",
+   ...:         ],
+   ...:         "Age": [22, 35, 58],
+   ...:         "Sex": ["male", "male", "female"],
+   ...:     }
+   ...: )
+```
+
+```
+df["Age"].max()
+```
+
+```
+titanic = pd.read_csv("data/titanic.csv")
+titanic.head(8) # head() 默认5条
+titanic.tail(10)
+titanic.to_excel("titanic.xlsx", sheet_name="passengers", index=False)
+```
+
+`index=False` the row index labels are not saved in the spreadsheet.
+
+```
+titanic.info()
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 891 entries, 0 to 890
+Data columns (total 12 columns):
+ #   Column       Non-Null Count  Dtype  
+---  ------       --------------  -----  
+ 0   PassengerId  891 non-null    int64  
+ 1   Survived     891 non-null    int64  
+ 2   Pclass       891 non-null    int64  
+ 3   Name         891 non-null    object 
+ 4   Sex          891 non-null    object 
+ 5   Age          714 non-null    float64
+memory usage: 83.7+ KB
+```
+
+```
+In [8]: age_sex = titanic[["Age", "Sex"]]  # 部分列
+In [9]: age_sex.head()
+```
+
+find(substr, beg=0, end=len(string)):
+
+在[beg, end]范围内查找substring，找到返回substr的起始下标，否则返回 -1。
+
+```
+above_35 = titanic[titanic["Age"] > 35] # 行过滤 ==, !=, <, <=,…， 
+```
+
+内部条件是一个 boolean series ,过滤出为True的行集
+
+```
+class_23 = titanic[titanic["Pclass"].isin([2, 3])]
+```
+
+```
+class_23 = titanic[(titanic["Pclass"] == 2) | (titanic["Pclass"] == 3)]
+```
+
+```
+titanic[titanic["Age"].notna()] 
+#  notna() conditional function returns a True for each row the values are not an Null value.
+```
+
+ 
+
+```
+adult_names = titanic.loc[titanic["Age"] > 35, "Name"]
+```
+
+```
+titanic.iloc[9:25, 2:5] # rows 10 till 25 and columns 3 to 5.    : 所有
+```
+
+三元表达式
+
+```
+h = a-b if a>b else a+b
+h = "变量1" if a>b else "变量2"
+```
+
+派生新列
+
+```
+In [4]: air_quality["london_mg_per_cubic"] = air_quality["station_london"] * 1.882
+
+In [5]: air_quality.head()
+
+air_quality["ratio_paris_antwerp"] = (
+     air_quality["station_paris"] / air_quality["station_antwerp"]
+ )
+```
+
+重命名表头
+
+```
+In [8]: air_quality_   d = air_quality.rename(
+   ...:     columns={
+   ...:         "station_antwerp": "BETR801",
+   ...:         "station_paris": "FR04014",
+   ...:         "station_london": "London Westminster",
+   ...:     }
+   ...: )
+```
+
+```
+air_quality_renamed = air_quality_renamed.rename(columns=str.lower)
+```
+
+
+
+聚合计算
+
+```
+titanic["Age"].mean() # 平均值
+
+In [5]: titanic[["Age", "Fare"]].median() 
+Out[5]: 
+Age     28.0000
+Fare    14.4542
+```
+
+```
+titanic[["Age", "Fare"]].describe()
+count :
+min:
+max:
+mean:
+```
+
+```
+In [7]: titanic.agg(
+   ...:     {
+   ...:         "Age": ["min", "max", "median", "skew"],
+   ...:         "Fare": ["min", "max", "median", "mean"],
+   ...:     }
+   ...: )
+```
+
+```
+titanic[["Sex", "Age"]].groupby("Sex").mean()
+titanic.groupby("Sex").mean()
+ titanic.groupby("Sex")["Age"].mean()
+```
+
+```
+In [12]: titanic["Pclass"].value_counts() # 等效 titanic.groupby("Pclass")["Pclass"].count()
+Out[12]: 
+3    491
+1    216
+2    184
+```
+
+```
+In [4]: air_quality = pd.read_csv(
+   ...:     "data/air_quality_long.csv", index_col="date.utc", parse_dates=True
+   ...: )
+   ...: 
+
+In [5]: air_quality.head()
+Out[5]: 
+                                city country location parameter  value   unit
+date.utc                                                                     
+2019-06-18 06:00:00+00:00  Antwerpen      BE  BETR801      pm25   18.0  µg/m³
+```
+
+**reshap layout of talbes**
+
+```
+In [6]: titanic.sort_values(by="Age").head()
+titanic.sort_values(by=['Pclass', 'Age'], ascending=False).head()
+```
+
+合并多个文件
+
+```
+air_quality = pd.concat([air_quality_pm25, air_quality_no2], axis=0)
+```
+
+The [`concat()`](https://pandas.pydata.org/docs/reference/api/pandas.concat.html#pandas.concat) function performs concatenation operations of multiple tables along one of the axis (row-wise or column-wise).default axis=0
+
+```
+print('Shape of the resulting ``air_quality`` table: ', air_quality.shape)
+Shape of the resulting ``air_quality`` table:  (3178, 4) # 行列个数
+```
+
+多行列头 多列表头 ？
+
+```
+air_quality_ = pd.concat([air_quality_pm25, air_quality_no2], keys=["PM25", "NO2"])# 打标签
+In [16]: air_quality_.head()
+Out[16]: 
+                         date.utc location parameter  value
+PM25 0  2019-06-18 06:00:00+00:00  BETR801      pm25   18.0
+     1  2019-06-17 08:00:00+00:00  BETR801      pm25    6.5
+     2  2019-06-17 07:00:00+00:00  BETR801      pm25   18.5
+     3  2019-06-17 06:00:00+00:00  BETR801      pm25   16.0
+     4  2019-06-17 05:00:00+00:00  BETR801      pm25    7.5
+```
+
+ 多表列合并
+
+```
+air_quality = pd.merge(air_quality, stations_coord, how="left", on="location")
+air_quality = pd.merge(air_quality, air_quality_parameters,
+   ....:                        how='left', left_on='parameter', right_on='id') 
+```
+
+字符串转日期
+
+```
+air_quality["datetime"] = pd.to_datetime(air_quality["datetime"])
+```
+
+```
+pd.read_csv("../data/air_quality_no2_long.csv", parse_dates=["datetime"])
+```
+
+```
+air_quality["datetime"].max() - air_quality["datetime"].min()
+```
+
+新增列，air_quality["month"] = air_quality["datetime"].dt.month ， `year`, `weekofyear`, `quarter`,
+
+```
+air_quality.groupby(
+   ....:     [air_quality["datetime"].dt.weekday, "location"])["value"].mean()
+```
+
+字符文本处理
+
+```
+titanic["Name"].str.split(",") # lower() .len()
+titanic["Surname"] = titanic["Name"].str.split(",").str.get(0)
+titanic["Name"].str.contains("Countess")
+titanic[titanic["Name"].str.contains("Countess")]
+```
+
+```
+titanic["Sex_short"] = titanic["Sex"].replace({"male": "M", "female": "F"})
+```
+
+# User Guid
 
 
 
 
 
+# Flask 生产部署
+
+Flask 是一个web框架，而非web server，直接用Flask拉起的web服务仅限于开发环境使用，生产环境不够稳定，也无法承受大量请求的并发，部署时用Gunicorn和Nginx(静态文件)，
+
+用Nginx转发Gunicorn服务，重点是解决“慢客户端行为”给服务器带来的性能降低问题；另外，在互联网上部署HTTP服务时，还要考虑的“快客户端响应”、SSL处理和高并发等问题，而这些问题在Nginx上一并能搞定，所以在Gunicorn服务之上加一层Nginx反向代理，是个一举多得的部署方案。
+
+ 
+
+通常，request handling这部分即服务端的计算，拼的是服务器的性能，处理是比较高效和稳定的，而request和response部分，影响因素比较多，如果这三个过程放到同一个进程中同步处理，如果request和response部分耗时比较多，会使计算资源被占据并无法及时释放，导致计算资源无法有效利用，降低服务器的处理能力。
+
+上述“慢客户端行为”，指的就是request（或response）部分耗时比较多的情况，Gunicorn恰好会把上面三个过程放到同一个进程中，当出现“慢客户端行为”时，效率很低。
+
+>  Gunicorn 'Green Unicorn' is a Python WSGI HTTP Server for UNIX. It's a pre-fork worker model. The Gunicorn server is broadly compatible with various web frameworks, simply implemented, light
+
+
+
+fruits = ['banana', 'apple',  'mango'] for index in range(len(fruits)):   print '当前水果 :', fruits[index]
+for fruit in fruits:        # 第二个实例   print '当前水果 :', fruit
 
 
 
 
 
+ inplace = True：不创建新的对象，直接对原始对象进行修改； ...  inplace = False：对数据进行修改，创建并返回新的对象承载其修改结果。 默认是False，即创建新的对象进行修改，原对象不变，和深复制和浅复制有些类似
+
+
+
+Web *Server* Gateway Interface (*WSGI*） WEB服务器 类似 tomcat
+
+Flask use a production WSGI server. 
+
+```
+$ waitress-serve --call 'flaskr:create_app'
+```
+
+# User Guide
+
+> Flask think that simple tasks should be simple
+
+Flask uses thread-local objects internally so that you don’t have to pass objects around from function to function within a request in order to stay threadsafe. This approach is convenient, but requires a valid request context for dependency injection or when attempting to reuse code which uses a value pegged to the request. 
+
+- [Watchdog](https://pythonhosted.org/watchdog/) provides a faster, more efficient reloader for the development server.
+- [Click](https://palletsprojects.com/p/click/) is a framework for writing command line applications.
+
+```
+$ mkdir myproject
+$ cd myproject
+$ python3 -m venv venv
+$ . venv/bin/activate
+$ pip install Flask
+
+# app.py>>>
+from flask import Flask
+app = Flask(__name__)
+@app.route("/")
+def hello_world():
+    return "<p>Hello, World!</p>"
+   
+export FLASK_ENV=development   # 允许在浏览器中debug
+flask run # http://127.0.0.1:5000/  python -m flask run
+```
+
+```
+from markupsafe import escape
+
+@app.route("/<name>") # / <script>alert("bad")</script>
+def hello(name):
+    return f"Hello, {escape(name)}!"
+    
+@app.route('/post/<int:post_id>') # string int float uuid path
+@app.route('/path/<path:subpath>') 取路径
+```
+
+```
+@app.route('/projects/') # 类似访问目录, 使用/projects访问时可以进入
+@app.route('/about') # 类似访问文件，/about/访问报错
+
+```
+
+
+
+当我们之间使用`pip`
+安装第三方包时，所有的依赖都会安装到安装目录下的`site-packages`。
+例如 TensorFlowV1 TensorFLowV2 ,site-packages下的依赖包就会产生冲突，后面安装的依赖包就会把前面已经安装的版本卸载掉然后再安装新版本依赖包。
+虚拟环境，在开发不同的工程时，可以创建并激活不同的虚拟环境。这样，不同的工程就会用到不同环境下的解析器，我们也可以把依赖包安装到不同虚拟环境的site-packages路径下。
+在Python中依赖管理一般指代**依赖管理+虚拟环境**。
+
+用 Poetry 来同时管理 Python 库和 Python 程序。 VS Code 支持 Poetry 环境了！
+
+
+
+**PyTorch**是一个[开源](https://zh.wikipedia.org/wiki/开源)的[Python](https://zh.wikipedia.org/wiki/Python)[机器学习](https://zh.wikipedia.org/wiki/机器学习)[库](https://zh.wikipedia.org/wiki/库)，基于[Torch](https://zh.wikipedia.org/w/index.php?title=Torch_(机器学习)&action=edit&redlink=1)[[2\]](https://zh.wikipedia.org/wiki/PyTorch#cite_note-2)[[3\]](https://zh.wikipedia.org/wiki/PyTorch#cite_note-3)[[4\]](https://zh.wikipedia.org/wiki/PyTorch#cite_note-4)，底层由C++实现，应用于[人工智能](https://zh.wikipedia.org/wiki/人工智能)领域，如[自然语言处理](https://zh.wikipedia.org/wiki/自然语言处理)。[[5\]](https://zh.wikipedia.org/wiki/PyTorch#cite_note-5) 它最初由[Facebook](https://zh.wikipedia.org/wiki/Facebook)的人工智能研究团队开发，[[6\]](https://zh.wikipedia.org/wiki/PyTorch#cite_note-6)[[7\]](https://zh.wikipedia.org/wiki/PyTorch#cite_note-7)[[8\]](https://zh.wikipedia.org/wiki/PyTorch#cite_note-8)并且被用于[Uber](https://zh.wikipedia.org/wiki/優步)的[概率编程](https://zh.wikipedia.org/wiki/概率编程)软件Pyro。[[9\]](https://zh.wikipedia.org/wiki/PyTorch#cite_note-9)
+
+PyTorch主要有两大特征：[[10\]](https://zh.wikipedia.org/wiki/PyTorch#cite_note-10)
+
+- 类似于[NumPy](https://zh.wikipedia.org/wiki/NumPy)的[张量](https://zh.wikipedia.org/wiki/张量)计算，可使用[GPU](https://zh.wikipedia.org/wiki/圖形處理器)加速；
+- 基于带[自动微分](https://zh.wikipedia.org/wiki/自动微分)系统[[11\]](https://zh.wikipedia.org/wiki/PyTorch#cite_note-11)[[12\]](https://zh.wikipedia.org/wiki/PyTorch#cite_note-12)的深度[神经网络](https://zh.wikipedia.org/wiki/神经网络)[[13\]](https://zh.wikipedia.org/wiki/PyTorch#cite_note-:0-13)。
 
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+过去几十年计算机科学家创造的 AI 系统只能在受限环境下解决特定问题，离通用 AI 还有一段距离。DeepMind 的科学家现在[认为](https://venturebeat.com/2021/06/09/deepmind-says-reinforcement-learning-is-enough-to-reach-general-ai/)，通用 AI 能通过一个简单而强有力的原则去实现：奖励最大化。他们发表了论文《[Reward is Enough](https://www.sciencedirect.com/science/article/pii/S0004370221000862)》，认为奖励最大化和试错足以发展出与智能相关的行为。AI 的一个分支强化学习（reinforcement learning） 是基于奖励最大化，能引领通用 AI 的发展。DeepMind 的研究人员提出一个假说：奖励最大化的通用目标足以驱动大部分如果不是全部的智能行为。大自然就是如此运作的，复杂有机物不存在自上而下的智能设计，数十亿年的自然选择和随机突变过滤出适合生存和繁殖的生命形式。能更好处理挑战和适应环境的生命生存和繁衍，其余则销声匿迹。这种简单而有效的机制演化出生命的各种能力和技能。
 
 
 

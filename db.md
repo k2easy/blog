@@ -158,7 +158,7 @@ WHERE RRN between 100 and 200
 
 
 
-# DB2 INTERSECT、EXCEPT 
+# DB2 INTERSECT、EXCEPT
 
 **交集**
 
@@ -932,6 +932,22 @@ ON R.YR = C.YR
 ORDER BY YR;
 ```
 
+数据库默认最大递归调用次数 MAXRECURSION=100 
+
+ 直到查询返回结果为空，递归停止。
+
+示例：查找此人的父辈节点
+
+![image-20210414214037951](https://cdn.jsdelivr.net/gh/k2easy/picgo/2021/04/1420210414214038.png)
+
+
+
+
+
+
+
+
+
 
 
 # [Dynamic order direction](https://stackoverflow.com/questions/1147763/dynamic-order-direction)
@@ -980,6 +996,60 @@ ORDER BY
         WHEN 'Title' THEN TitleSort
      END * @multiplier;
 ```
+
+
+
+
+
+```sql
+ALTER TABLE Table_Name DROP PRIMARY KEY;
+
+ALTER TABLE Table_Name ADD PRIMARY KEY (Column_One, Column_Two);
+```
+
+
+
+
+
+# oracle
+
+```sql
+OFFSET 10 ROWS  FETCH NEXT 10 ROWS ONLY;
+
+employee_id IN(SELECT ...)
+
+
+expression [ NOT ] BETWEEN low AND high 
+-- 如果表达式(expression)的值大于或等于low的值，小于或等于hight的值，则BETWEEN运算符返回true。
+order_date BETWEEN DATE '2016-12-01' AND DATE '2016-12-31'  
+
+SELECT CONCAT(CONCAT('A', 'B'),'C')
+FROM dual;
+
+string1 || string2 [ || string_n ]
+
+substr(char,pos,len)
+instr(char,substr)	查子串位置	instr('nice','c')	3
+replace(char,old,new)	字符串替换	replace('nice','c','cc')	nicce
+
+to_number（数值类型的字符)：将字符转换为数值
+nvl(字段名，新的值)：若字段值不为null，则返回该字段值；若为null，则返回新的值。
+nvl2(字段名，处理1，处理2)：若字段值不为null，则执行处理1；若为null，则执行处理2。
+```
+
+```
+select sysdate  hz from dual;
+```
+
+```
+ select deptno,listagg(ename,',')within group(order by sal)name from emp group by deptno;
+ select deptno,ename,sal,listagg(ename,',')within group(order by sal)over(partition by deptno)name from emp;
+```
+
+
+
+ID INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1 ),
+
 
 
 

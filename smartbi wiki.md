@@ -134,6 +134,12 @@ C. 将参数绑定在单元格上（无法移除参数）
 
 
 
+
+
+
+
+
+
 	 电子表格拖拽字段到表格上后，字段的左父格和上父格都默认为“ 有
 	
 	 电子表格中为了让标题行在分页之后的每一页都还可以继续显示，C. 设置打印标题
@@ -4112,3 +4118,264 @@ EXCEPT
 FROM TABLE_2 )
 ```
 
+
+
+### 使用高速缓存
+
+http://mirrors.aliyun.com/centos/7.9.2009/isos/x86_64/
+
+
+
+ Windows Server最低 2016 支持docker
+使用 a virtual machine 
+
+
+
+windows server 2019 datacenter 1809 
+
+## vmware 网络
+
+桥接网络是指本地物理网卡和虚拟网卡通过VMnet0虚拟交换机进行桥接，物理网卡和虚拟网卡在拓扑图上处于同等地位，那么物理网卡和虚拟网卡就相当于处于同一个网段，虚拟交换机就相当于一台现实网络中的交换机,所以两个网卡的IP地址也要设置为同一网段。
+
+  所以当我们要在局域网使用虚拟机，对局域网其他pc提供服务时，例如提供ftp，提供ssh，提供http服务，那么就要选择桥接模式。
+
+
+
+NAT模式中，就是让虚拟机借助NAT(网络地址转换)功能，通过宿主机器所在的网络来访问公网。
+
+  NAT模式中，虚拟机的网卡和物理网卡的网络，不在同一个网络，虚拟机的网卡，是在vmware提供的一个虚拟网络。
+
+NAT模式和桥接模式虚拟机都可以上外网。
+
+  (2) 由于NAT的网络在vmware提供的一个虚拟网络里，所以局域网其他主机是无法访问虚拟机的，而宿主机可以访问虚拟机
+
+
+
+Host-Only模式下，虚拟网络是一个全封闭的网络，它唯一能够访问的就是主机。Host-Only的宗旨就是建立一个与外界隔绝的内部网络，来提高内网的安全性。
+
+
+
+
+
+数据列字段 放在单元格内，横向扩展 ，可以使用 单元格属性里的 其他 组内排序。
+
+
+
+```
+document.querySelectorAll('[property]'); // All with attribute named "property"
+document.querySelectorAll('[property="value"]'); // All with "property" set to "value" exactly.
+document.querySelectorAll('span[property]');
+
+var y = document.getElementsByClassName('foo');
+var aNode = y[0];
+
+document.querySelector('.gfield_list_cell.gfield_list_72_cell3 input').setAttribute('placeholder','$');
+```
+
+vmware
+
+#### 宿主机与虚拟机组成局域网，其他电脑不能访问该网络
+
+##### 1.1 仅主机模式
+
+- 虚拟机和宿主机组成一个封闭的局域网
+- 虚拟机不能访问外部网络、互联网
+- 外部网络也不能访问虚拟机
+
+1.2 桥接模式
+
+#### 虚拟机加入工作单位局域网，其他电脑允许访问虚拟机
+
+##### 2.1该方式特点
+
+- 可以将虚拟机看做一台新电脑，接入了宿主机所在的网络，如果是在工作单位，可能造成虚拟机IP占用单位同事电脑的IP地址，小心单位网管会找你呦。。。
+- 虚拟机允许访问宿主机所在网络的其他电脑
+- 虚拟机允许访问Internet互联网（当然宿主机必须可以访问互联网才行）。
+- 主机和虚拟机通过单位局域网，互联互通。
+
+3.1 NAT模式
+
+#### 虚拟机通过宿主机访问互联网
+
+##### 3.1该方式特点
+
+- 虚拟机和宿主机组成小局域网，做到互联互通。
+- 虚拟机通过宿主机访问外部网络（此时宿主机起到路由器作用），但外部网络不能访问虚拟机
+- 虚拟机允许访问Internet互联网（当然宿主机必须可以访问互联网才行）
+
+
+
+puppeteer 高清截图
+
+Therefore to increase the resolution of a screenshot you need to increase the resolution of the viewport prior taking the screenshot. I.e.: To mimic a hDPI / retina screen, increase the `deviceScaleFactor` argument of [setviewport](https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#pagesetviewportviewport).
+
+```
+await page.setViewport({width: 800, height: 800, deviceScaleFactor: 2}); //retina
+```
+
+
+
+python html邮件发送  驾驶舱截图
+https://www.liaoxuefeng.com/wiki/1016959663602400/1017790702398272
+
+
+
+
+
+# 小小系统wins2019迁移到 wins2012
+
+```
+[BadImageFormatException: Could not load file or assembly 'IBM.Data.DB2' or one of its dependencies. An attempt was made to load a program with an incorrect format.]
+ 
+```
+
+defaul pool>高级设置》允许32位 true ,重启 defaultAppPool
+
+db2app.dll 找不到，安装 ibm data server dirver ,all feature 默认路径，
+
+安装64位 driver 添加环境变量，重启服务器
+
+重装，清空 programData>IBM 文件夹
+
+ 
+
+单点登录脚本修改默认密码 xiaoxuehong_900 000工号
+
+https://www.cnblogs.com/csy918/p/14479960.html
+
+https://www.cnblogs.com/Ming8006/p/6137662.html
+
+https://enterprise.arcgis.com/zh-cn/web-adaptor/latest/install/iis/enable-iis-2012-components-server.htm
+
+# [C#连接db2数据库](https://www.cnblogs.com/xubao/p/10984069.html)
+
+1、通过OLE DB for DB2驱动
+2、通过IBM提供的IBM.data.DB2.DLL
+
+```
+    string strSql = @"select phone_no from no_store where id<5";
+    string strConn = "Database=数据库名;UID=用户名;PWD=密码;";
+    using (DB2Connection conn = new DB2Connection(strConn))
+    {
+        DB2Command cmd = new DB2Command(strSql, conn);
+```
+
+
+
+# ftp
+
+exe zip 开binary data mode  上传下载
+
+```
+
+
+ftp> ls -l target-directory
+Set the transfer type to binary.
+
+
+ftp> binary
+To copy a single file, use the put command.
+
+
+ftp> put filename
+To copy multiple files at once, use the mput command.
+
+
+ftp> mput filename [filename ...]
+# mget 
+
+ftp>bye
+
+
+```
+
+
+
+Smartbi	4G	Tomcat的JVM内存最大值，可根据并发量调整此参数
+知识库	4G	Mysql可能会使用的内存
+UnionServer	8G	跨库的默认内存配置，可调整
+导出引擎	4G	导出引擎可能会使用的内存
+
+https://wiki.smartbi.com.cn/pages/viewpage.action?pageId=60392583
+
+16核+64G+部署目录500G+千兆网络+推荐服务器单独一个盘符用于部署smartbi及其组件
+
+查看下内存 磁盘 使用量
+
+
+
+## 定时发送邮件pdf附件
+
+计划任务以邮件附件形式发送报表，发现附件名为乱码
+
+```
+该问题是因为附件的名称太长或者名称有中文，需要做下面设置：
+1、增加JVM参数-Dmail.mime.splitlongparameters=false，JVM设置可参考部署或使用过程中出现错误java.lang.OutOfMemoryError: PermGen space或者java heap space 设置 
+2、定制管理 > 系统选项 > 公共设置-邮件设置 中设置文件名字符集为空。
+```
+
+若按上面的两个步骤设置后，邮箱收到的附件还是乱码的形式，是服务器没有对应的中文字体导致的，可以参考文档中的步骤添加相关的字体：[电子表格打印或导出到PDF时以及图形上中文变乱码](https://wiki.smartbi.com.cn/pages/viewpage.action?pageId=35750676)
+
+
+
+合并pdf
+
+Why not use the [PDFMergerUtility](https://pdfbox.apache.org/docs/2.0.0/javadocs/org/apache/pdfbox/multipdf/PDFMergerUtility.html) of pdfbox?
+
+```
+PDFMergerUtility ut = new PDFMergerUtility();
+ut.addSource(...); //addSource(File source)
+ut.addSource(...);
+ut.addSource(...);
+ut.setDestinationFileName(...);
+ut.mergeDocuments();
+```
+
+ 
+
+##### [通过计划任务把电子表格导出图片以邮件正文，并且以excel为附件发送](https://wiki.smartbi.com.cn/pages/viewpage.action?pageId=37292458)
+
+
+
+sql中注释的方式是/*注释内容*/，但是注释中不能包含分号，
+
+添加jar包重启
+
+
+
+[电子表格预缓存](https://wiki.smartbi.com.cn/pages/viewpage.action?pageId=65624076)
+
+```ft
+// 自定义方法2
+function` `your_method_2(arg0) {
+  ``System.out.println(``"method_2: "` `+ arg0);
+}
+ 
+// 计划任务主体代码
+var` `loopCount = 3;
+for` `(``var` `i = 0; i <= loopCount; i++) {
+  ``your_method_1(i);
+  ``your_method_2(i);
+}
+```
+
+jar 包扔到lib 下 清空 tomcat缓存文件 ，bi缓存即可 引用成功。
+
+升级前需要备份 smartbi ，
+
+
+
+smartbi迁移，旧的公开地址 映射到 新服务器的 地址端口
+
+
+
+### 端口映射
+
+  无论是跳板服务还是nginx转发 我们要做的事情就更多了。所以我们要想到另一种思路。就是2.2.2.2这台机器能不能帮我转发，只是作为一个中间者。就是我请求了2.2.2.2:8080 实际上请求到了是1.1.1.1:8080.转发也可以用`iptables` 或者`firewalld`做NAT转发，但是不懂得原理的会比较复杂，这里推荐一款工具，`rinted`,一行配置搞定转发。
+
+- http://www.rinetd.com/
+- `mkdir /usr/man/`
+- `vi /etc/rinetd.conf`
+  `0.0.0.0 7075 10.46.108.225 7075` 本机7075端口转发映射到10.46.108.225:7075
+- `压缩，进入目录 make && make install`
+- `rinetd -c /etc/rinetd.conf `读取映射转发配置，使之生效

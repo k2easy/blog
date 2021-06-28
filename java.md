@@ -2989,3 +2989,16 @@ windows server 2008/windows 2007系统版本存在的一个bug，需要在系统
 
 
 ，虽然重启服务器能够立马释放socket连接（注意这里不是重启tomcat服务器），但是这种方式只是治标不治本，这种问题后面可能还会出现，对于这种问题，应该从代码和硬件角度来考虑解决。首先代码中对于httpclient建立的连接应该及时关闭，同时还可以修改服务器的注册表，提高socket可用连接数，同时减少time-wait时间，让处于time-wait状态的连接尽快释放。
+
+
+
+
+
+```java
+Map<String, String> myMap = new HashMap<String, String>() {{
+        put("a", "b");
+        put("c", "d");
+    }};
+
+
+```

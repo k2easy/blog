@@ -76,7 +76,7 @@ ODBC(Open Database Connectivity，开放数据库互连)
 
 由Airbnb贡献的轻量级BI产品，Superset语义层建模（被称为Table）时只能基于单表，多表关联要事先逻辑化成视图再使用，这点有点别扭。在Table里要显示地将字段标记成可分组、可过滤，指定聚合方式（计数、求和等），页面在使用时需要选择Group by（并没有叫做维度）、Metrics和Filter进行查询。
 
-![img](https://pic4.zhimg.com/80/v2-4bfa894a768566deb2f75d151655828e_1440w.jpg?source=1940ef5c)
+![img](https://cdn.jsdelivr.net/gh/k2easy/picgo/2021/04/2320210423070309.jpg)
 
 缺点：
 
@@ -275,11 +275,298 @@ Flink并不提供自己的数据存储系统，但为[Amazon Kinesis](https://zh
 
 
 
+Databricks是由Apache Spark的最初創建者創建的企業軟件公司
+
+  Redash is joining Databricks
+
+> We’re excited to be one of the many open-source projects that Databricks supports. They’re the original creators of Apache Spark™, the standard for large-scale data processing, as well as Delta Lake for reliable data lakes, MLflow for the machine learning lifecycle, Koalas for data science productivity on Spark. Now, Redash joins this community of open source projects for collaborative SQL queries and dashboarding. 
+
+**Redash includes the following features:**
+
+1. **Query editor:** Quickly compose SQL and NoSQL queries with a schema browser and auto-complete.
+2. **Visualization and dashboards:** Create beautiful visualizations with drag and drop, and combine them into a single dashboard.
+3. **Sharing:** Collaborate easily by sharing visualizations and their associated queries, enabling peer review of reports and queries.
+4. **Schedule refreshes:** Automatically update your charts and dashboards at regular intervals you define.
+5. **Alerts:** Define conditions and be alerted instantly when your data changes.
+6. **REST API:** Everything that can be done in the UI is also available through REST API.
+7. **Broad support for data sources:** Extensible data source API with native support for a long list of common SQL, NoSQL databases and platforms.
 
 
 
 
 
+# [SQLite is not a toy database](https://antonz.org/sqlite-is-not-a-toy-database/)
+
+```
+> .import --csv city.csv city
+> select count(*) from city;
+```
+
+
+
+ 
+
+# [Redash Developer Installation Guide](https://redash.io/help/open-source/dev-guide/setup)
+
+```
+文件开头
+#!/usr/bin/env python
+
+man env
+env command // using the first directory in the PATH that contains the python3 executable.
+```
+
+
+
+### 12. Virtual Environments and Packages[¶](https://docs.python.org/3.7/tutorial/venv.html#virtual-environments-and-packages)
+
+```
+python3 -m venv tutorial-env 调用venv模块创建项目 
+source tutorial-env/bin/activate 
+tutorial-env\Scripts\activate.bat
+
+$ pip install requests==2.6.0
+$ pip install --upgrade requests
+$ pip show requests
+ (tutorial-env) $ pip list #  display all of the packages installed in the virtual environment:
+
+```
+
+“search”, “install”, “uninstall”, “freeze”, etc
+
+`pip freeze` will produce a similar list of the installed packages, 
+
+```
+(tutorial-env) $ pip freeze > requirements.txt
+(tutorial-env) $ cat requirements.txt 
+其他人恢复环境，执行 $ pip install -r requirements.txt
+```
+
+
+
+### [click](https://pypi.org/project/click/)
+
+“Command Line Interface Creation Kit”.
+
+```
+$ pip install -U click   // -U upgrade
+
+import click
+
+@click.command()
+@click.option("--count", default=1, help="Number of greetings.")
+@click.option("--name", prompt="Your name", help="The person to greet.")
+def hello(count, name):
+    """Simple program that greets NAME for a total of COUNT times."""
+    for _ in range(count):
+        click.echo(f"Hello, {name}!")
+
+if __name__ == '__main__':
+    hello()
+
+
+$ python hello.py --count=3
+Your name: Click
+Hello, Click!
+Hello, Click!
+Hello, Click!
+```
+
+
+
+
+
+
+
+# [clickhouse.tech》](https://clickhouse.tech/docs/zh/)
+
+## 简介
+
+ClickHouse是一个用于联机分析(OLAP)的列式数据库管理系统(DBMS)
+
+- 绝大多数是读请求
+- 数据以相当大的批次(> 1000行)更新，而
+- 已添加到数据库的数据不能修改。
+- 对于读取，从数据库中提取相当多的行，但只提取列的一小部分。
+- 宽表，即每个表包含着大量的列
+- 查询相对较少(通常每台服务器每秒查询数百次或更少)
+- 对于简单查询，允许延迟大约50毫秒
+- 列中的数据相对较小：数字和短字符串(例如，每个URL 60个字节)
+- 处理单个查询时需要高吞吐量(每台服务器每秒可达数十亿行)
+- 事务不是必须的
+- 对数据一致性要求低
+- 每个查询有一个大表。除了他以外，其他的都很小。
+- 查询结果明显小于源数据。换句话说，数据经过过滤或聚合，因此结果适合于单个服务器的RAM中
+
+## When NOT to use ClickHouse
+
+- ✕ Transactional workloads (OLTP)
+- ✕ Key-value requests with a high rate
+
+- ✕ Blob or document storage
+- ✕ Over-normalized data
+
+
+
+支持的查询[GROUP BY](https://clickhouse.tech/docs/zh/sql-reference/statements/select/group-by/), [ORDER BY](https://clickhouse.tech/docs/zh/sql-reference/statements/select/order-by/), [FROM](https://clickhouse.tech/docs/zh/sql-reference/statements/select/from/), [JOIN](https://clickhouse.tech/docs/zh/sql-reference/statements/select/join/), [IN](https://clickhouse.tech/docs/zh/sql-reference/operators/in/)以及非相关子查询。
+
+相关(依赖性)子查询和窗口函数暂不受支持，
+
+数据压缩，解压效率高
+
+为了高效的使用CPU，数据不仅仅按列存储，同时还按向量(列的一部分)进行处理，这样可以更加高效地使用CPU。
+
+## 实时的数据更新[ ](https://clickhouse.tech/docs/zh/introduction/distinctive-features/#shi-shi-de-shu-ju-geng-xin)
+
+ClickHouse支持在表中定义主键。为了使查询能够快速在主键中进行范围查找，数据总是以增量的方式有序的存储在MergeTree中。因此，数据可以持续不断地高效的写入到表中，并且写入的过程中不会存在任何加锁的行为。
+
+## 支持近似计算[¶](https://clickhouse.tech/docs/zh/introduction/distinctive-features/#zhi-chi-jin-si-ji-suan)
+
+1. 用于近似计算的各类聚合函数，如：distinct values, medians, quantiles
+2. 基于数据的部分样本进行近似查询。这时，仅会从磁盘检索少部分比例的数据。
+3. 不使用全部的聚合条件，通过随机选择有限个数据聚合条件进行聚合。 
+
+持自定义[JOIN](https://clickhouse.tech/docs/zh/sql-reference/statements/select/join/)多个表，它更倾向于散列连接算法，如果有多个大表，则使用合并-连接算法
+
+### 支持数据复制和数据完整性[ ](https://clickhouse.tech/docs/zh/introduction/distinctive-features/#zhi-chi-shu-ju-fu-zhi-he-shu-ju-wan-zheng-xing)
+
+ClickHouse使用异步的多主复制技术。当数据被写入任何一个可用副本后，系统会在后台将数据分发给其他副本，以保证系统在不同副本上保持相同的数据。在大多数情况下ClickHouse能在故障后自动恢复，在一些少数的复杂情况下需要手动恢复。
+
+### 限制[ ](https://clickhouse.tech/docs/zh/introduction/distinctive-features/#clickhouseke-xian-zhi)
+
+1. 没有完整的事务支持。
+2. 缺少高频率，低延迟的修改或删除已存在数据的能力。仅能用于批量删除或修改数据，但这符合 [GDPR](https://gdpr-info.eu/)。
+3. 稀疏索引使得ClickHouse不适合通过其键检索单行的点查询。
+
+
+
+
+
+
+
+`ifconfig` is now `ip a`. Try `ip -s -c -h a`.
+
+```
+ifconfig
+```
+
+is equivalent to
+
+```
+ip addr show
+```
+
+
+
+
+
+
+
+### `resolve.symlinks` 
+
+```
+boolean = true
+```
+
+是否将符号链接(symlink)解析到它们的符号链接位置(symlink location)。
+
+启用时，符号链接(symlink)的资源，将解析为其 *真实* 路径，而不是其符号链接(symlink)的位置。
+
+
+
+Elasticsearch最擅长的主要是完全搜索场景（where过滤后的记录数较少），在内存富裕运行环境下可以展现出非常出色的并发查询能力。但是在大规模数据的分析场景下（where过滤后的记录数较多），ClickHouse凭借极致的列存和向量化计算会有更加出色的并发表现，并且查询支持完备度也更好。ClickHouse的并发处理能力立足于磁盘吞吐，而Elasticsearch的并发处理能力立足于内存Cache，这使得两者的成本区间有很大差异，ClickHouse更加适合低成本、大数据量的分析场景，它能够充分利用磁盘的带宽能力。数据导入和存储成本上，ClickHouse更加具有绝对的优势。
+
+
+
+
+
+Apache Superset和Tableau
+
+
+
+
+
+# Why GO
+
+数据时代公司 DataTech BI,dtBI
+
+目前，计算机领域正在从 IT 时代向 DT 时代迅速演进。
+       IT 时代，就是信息科技时代。是用信息技术改善工作效率。
+       DT 时代，就是数据科技时代。根据数据进行决策，改善决策效率。
+
+根据数据进行决策，这个工作可以分为两个部分，一个部分是数据的采集、整理、加工和处理，另一部分是使用统计学、机器学习、人工智能等的模型从数据中提取知识进行决策。
+
+
+
+​       数据和数据之间的关系，决定了基于数据决策的效果的理论上限。模型，只能无限逼近这个理论上限。
+
+​       而且，现实中，简单和复杂的模型，其实际效果相差都不大。因此，如何搜集数据、处理数据、加工数据、分析数据，这样的脏活和累活，其实才是数据科学工作中最重要的工作，也是工作量最大的工作。设计模型相对来说没有那么重要。
+
+ 目前，数据处理和分析，主要使用的是 Python 语言，也有一些统计学背景的从业者使用 R 语言。当然，也有人使用 SAS，SPSS，Matlab 等付费语言和软件。
+
+​      Python 语言中，numpy 和 Pandas 库更是数据分析的神器
+
+日常进行一些探索性的数据分析，Python 是非常实用的工具。Python 开发效率高，可以快速编写出多个版本的代码，进行数据探索，寻找内部规律。
+
+
+      但是，一旦在生产环境中部署 Python 数据分析程序，就会暴露出 Python 程序运行性能低的问题。生产环境中并发访问量有时可能很大，如果部署 Python 的数据分析程序，由于其性能较低，需要部署大量节点，使用大量计算资源来满足并发需求。这成本就比较高了。
+
+​      而且即使部署大量资源，由于 Python 程序性能较低，也难以满足某些要求快速响应的业务场景。
+
+​      那么，有没有什么适合数据分析且运行效率高的语言呢？R 语言行不行呢？抱歉，R 语言虽然也非常适合编写数据分析程序，但是 R 语言的运行效率比 Python 语言还低。
+
+​      我发现 Go 语言，是替代 Python 进行高性能数据分析非常适合的语言。
+
+Go 语言中也有对应的开源软件：gonum 和 gota。
+
+
+
+PingCAP 数据库机遇 Mysql数据库开发的分布式数据库
+
+**Bigtable是用于管理结构化数据的分布式存储系统**
+ Bigtable旨在可靠地扩展到PB级数据和数千台计算机。
+
+
+
+**Tableau**重点是一种图形化的，非专业统计学人士使用的分析工具，而不是一个报表工具。重点是这个分析过程。首先业务有个问题，然后在分析中发现答案，然后把分析图表发给业务人员，告诉他们分析结果。所以这种分析要求直观，能够展现数据的特点。美观是次要的。
+
+Tableau是BI工具，可以实现简单报表展示，但更多的是图表的可视化。
+
+而中国式报表，尤其是政企事业单位、银行业还有一些国企的特点是很明显的，主要是表格类数据报表，类目多、数据明细，十分复杂。
+
+Tableau这种自助式BI工具重在可视化分析，复杂的中国式报表还是得通过报表软件或者excel来完成。
+
+都说 tableau做不了 中国式报表
+
+SmartBI的自助仪表盘 借鉴的 Tableau 可视化
+
+**Apache Parquet**是Apache Hadoop生态系统的一种免费的，开源的，面向列的数据存储格式。它类似于Hadoop中可用的其他列存储文件格式，即RCFile和ORC。它与Hadoop环境中的大多数数据处理框架兼容。
+
+
+
+[常见 列数据库 评价](https://news.ycombinator.com/item?id=22457767)
+
+clickhouse只有一个外部依赖，Zookeeper
+
+Greenplum is a Postgres fork, and same scale requires much more hardware. Citus is row based, and therefore will lag in scan time for many OLAP query patterns. Presto, Hive, Spark, all of the "post-hadoop" options may scale larger, but will also lag in scan time, and have significant external dependencies - mainly storage.
+
+Clickhouse is easy to install, configure a cluster, load and query. It does have limitations, but currently all horizontally scaled database platforms do.
+
+
+
+Clickhouse is extremely optimized for performing analytics on time series style data. T
+
+
+
+It’s operationally simple in both the scale-up and the scale-down. clickhouse 相对于 pg分片 更易新增机器 。
+
+1. Rows are sorted based on a primary key, and columns are individually stored and compressed in physical files. This enabled the data behind Tagstore to go from terabytes to gigabytes on disk.
+2. Data can be queried as soon as it is written in real time. 
+3. There’s no magic of a query planner. If we want to optimize a query pattern, the solutions that ClickHouse provides are few but potent. Most importantly, their ability to provide a [PREWHERE](https://clickhouse.yandex/docs/en/query_language/select/#prewhere-clause) clause enables us to skip a vast amount of data due to strong filtration conditions.
+
+
+
+##### [ClickHouse + SuperSet](https://altinity.com/blog/visualizing-clickhouse-data-with-apache-superset-part-1-installation)
 
 
 
